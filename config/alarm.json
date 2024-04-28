@@ -1,0 +1,68 @@
+{
+    "log_level": "debug",
+    "http": {
+        "enabled": true,
+        "listen": "0.0.0.0:9912"
+    },
+    "redis": {
+        "addr": "%%REDIS%%",
+        "addrCMDBCache": "%%REDIS%%",
+        "maxIdle": 5,
+        "highQueues": [
+            "event:p0",
+            "event:p1",
+            "event:p2",
+            "event:p3"
+        ],
+        "lowQueues": [
+            "event:p4",
+            "event:p5",
+            "event:p6"
+        ],
+        "userIMQueue": "/queue/user/im",
+        "userSmsQueue": "/queue/user/sms",
+        "userMailQueue": "/queue/user/mail",
+        "pigeonHighQueue": "/queue/pigeon/high",
+        "pigeonLowQueue": "/queue/pigeon/low"
+    },
+    "api": {
+        "im": "",
+        "sms": "",
+        "mail": "",
+        "dashboard": "http://127.0.0.1:8081",
+        "cmdb": "",
+        "plus_api":"http://127.0.0.1:8080",
+        "plus_api_token": "%%PLUS_API_DEFAULT_TOKEN%%"
+    },
+    "send_ok": true,
+    "change_ignore": true,
+    "send_more_max": true,
+    "pigeon": {
+        "alarm_addr": "http://10.199.134.131:7043/alarm/report.do",
+        "ok_addr": "http://10.199.134.131:7043/alarm/deal.do",
+        "fid_addr": "http://10.199.134.131:7043/pigeon/fid/add.do",
+        "high_combiner": {
+            "levels": [],
+            "interval": 20
+        },
+        "low_combiner": {
+            "levels": [],
+            "interval": 60
+        }
+    },
+    "falcon_portal": {
+        "addr": "%%MYSQL%%/alarms?charset=utf8&loc=Asia%2FChongqing",
+        "idle": 10,
+        "max": 100
+    },
+    "worker": {
+        "im": 10,
+        "sms": 10,
+        "mail": 50,
+        "pigeon": 20
+    },
+    "housekeeper": {
+        "event_retention_days": 7,
+        "event_delete_batch": 100
+    }
+}

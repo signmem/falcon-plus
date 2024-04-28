@@ -1,0 +1,93 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/open-falcon/falcon-plus/modules/agent/cron"
+	"github.com/open-falcon/falcon-plus/modules/agent/funcs"
+	"github.com/open-falcon/falcon-plus/modules/agent/g"
+	"github.com/open-falcon/falcon-plus/modules/agent/http"
+)
+
+func main() {
+
+	cfg := flag.String("c", "cfg.json", "configuration file")
+	version := flag.Bool("v", false, "show version")
+	check := flag.Bool("check", false, "check collector")
+	showpid := flag.Bool("showpid",false, "show process pid")
+
+	flag.Parse()
+
+	if *version {
+		pluginInfo := g.GetVersionFileInfo()
+		fmt.Printf("falcon-agent version is %s\n", g.VERSION)
+		fmt.Printf("%s", pluginInfo)
+		os.Exit(0)
+	}
+
+	if *check {
+		funcs.CheckCollector()
+		os.Exit(0)
+	}
+
+	if *showpid {
+		pid, err := g.ReadPid()
+		if err != nil {
+			fmt.Printf("%s\n", err)
+			os.Exit(1)
+		}else{
+			fmt.Printf("%d\n", pid)
+			os.Exit(0)
+		}
+	}
+
+	g.ParseConfig(*cfg)
+
+	if g.Config().Debug {
+		g.InitLog("debug")
+	} else {
+		g.InitLog("info")
+	}
+
+	// g.WritePid()  ## write pid to pidfile setting. not necessary. terry.zeng
+	g.InitRootDir()
+	g.InitLocalIp()
+	g.InitRpcClients()
+
+	g.GenCronTime()
+	log.Println("cron job is: ", g.JobTime.Hour, ":" , g.JobTime.Minite)
+
+	funcs.BuildMappers()
+
+	go cron.InitDataHistory()
+
+	go cron.SyncPlugin()       // use to rsync to sync plugin
+	go cron.GetMetricCount()
+	cron.ReportAgentStatus()
+	cron.SyncMinePlugins()
+	cron.SyncBuiltinMetrics()
+	cron.SyncTrustableIps()
+	cron.Collect()
+
+	// go http.Start()
+        // 部分 服务器， 由于 ip 地址或网卡没有正确配置
+        //    例如不写成 bond0.20@bond0  而是按官方写成 vlan20@bond0 
+        //    那么会遇到下面错误 
+        //    listen tcp :22230: bind: address already in use
+        // 
+        //    解决办法  
+        //       cp modules/agent/main_listen_all.go   modules/agent/main.go
+        //       modules/agent/http/http_listen_all.go  modules/agent/http/http.go
+        //
+        //    然后再编译
+        //    但这样子会只监听 :22230 
+        // 
+
+	go http.StartLoopback()
+
+	select {}
+
+}

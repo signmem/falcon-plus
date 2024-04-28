@@ -1,0 +1,19 @@
+{
+    "log_level": "debug",
+    "gauge": true,
+    "http": {
+        "enabled": true,
+        "listen": "%%TREND_HTTP%%"
+    },
+    "rpc": {
+        "enabled": true,
+        "listen": "%%TREND_RPC%%"
+    },
+    "db": {
+        "dsn": "root:@tcp(127.0.0.1:3306)/vip_falcon_aggregator?loc=Local&parseTime=true",
+        "batch": 200,
+        "batchInterval": 200,
+        "concurrent": 1,
+        "maxIdle": 2
+    }
+}

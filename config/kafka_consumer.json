@@ -1,0 +1,58 @@
+{
+    "log_level": "info",
+    "http": {
+        "enabled": true,
+        "listen": "%%CONSUMER_HTTP%%"
+    },
+    "consumer": {
+        "kafkaVersion": "low",
+        "topics": ["vipfalcon"],
+        "group": "vipfalcon_trend",
+        "offset": "newest",
+        "offsetTimeout": 10,
+        "concurrent": 32,
+        "zookeeper": "10.199.234.105:2181/kafka",
+        "kafka": []
+    },
+    "trend": {
+        "enabled": true,
+        "batch": 200,
+        "connTimeout": 1000,
+        "callTimeout": 5000,
+        "maxConns": 32,
+        "maxIdle": 32,
+        "replicas": 500,
+        "cluster": {
+            "trend-00" : "%%TREND_RPC%%"
+        }
+    },
+    "transfer": {
+        "enabled": true,
+        "batch": 200,
+        "retry": 1,
+        "connTimeout": 1000,
+        "callTimeout": 5000,
+        "maxConns": 32,
+        "maxIdle": 32,
+        "cluster": {
+            "transfer-00": "%%TRANSFER_RPC%%"
+        }
+    },
+    "percent_check": {
+        "cpu.idle": true,
+        "cpu.user": true,
+        "cpu.nice": true,
+        "cpu.system": true,
+        "cpu.iowait": true,
+        "cpu.irq": true,
+        "cpu.softirq": true,
+        "cpu.steal": true,
+        "cpu.guest": true
+    },
+    "ignore_host": {
+        "localhost": true,
+        "localhost.example": true,
+        "localhost.localdomain": true,
+        "local_host": true
+    }
+}

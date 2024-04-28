@@ -1,0 +1,31 @@
+{
+    "debug": false,
+    "dblog": false,
+    "logrotateage": 86400,
+    "logmaxage": 432000,
+    "logfile": "/apps/svr/falcon-plus/trend/logs/app.log",
+    "metricport": "6991",
+    "gauge": true,
+    "http": {
+        "enabled": true,
+        "listen": "0.0.0.0:6991"
+    },
+    "rpc": {
+        "enabled": true,
+        "listen": "0.0.0.0:6990"
+    },
+    "db": {
+        "dsn": "user:password@tcp(127.0.0.1:3306)/vip_falcon_aggregator?loc=Local&parseTime=true",
+        "batch": 200,
+        "batchInterval": 60,
+        "concurrent": 1,
+        "maxIdle": 4
+    },
+    "redis": {
+        "server": "x.x.x.x",
+        "port": "6379",
+        "maxidle": 30,
+        "maxactive" : 50,
+        "idletimeout": 60
+    }
+}

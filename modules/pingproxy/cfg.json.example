@@ -1,0 +1,11 @@
+{
+	"debug": true,
+	"logfile": "",
+	"logmaxage": 432000,
+	"logrotateage": 86400,
+	"http": {
+		"enabled": true,
+		"listen":"",
+                "port": ""
+	}
+}

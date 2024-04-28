@@ -1,0 +1,64 @@
+{
+    "debug":true,
+    "forcecheck": false,  // forcecheck = true 用于强制校验，不需要等到每日下午 15:30 
+    "alarmenable": true,  // alarmenable = true 允许告警， false 不执行告警
+    "logmaxage": 432000,
+    "logrotateage": 86400,
+    "logfile": "/apps/svr/falcon-plus/pingcheck/logs/app.log",
+    "agentexpire" : 300,        // check agent ttl expire time limit
+    // "flushkeyinterval": 300,    // reflush redis hostname (暂时没用到)
+    "checkinterval": 60,        // interval to connect redis 每 60 秒检测 REDIS 一次
+    "agentpriority":"3",        // send alarm priority, 默认 3 = 一般严重
+    "excludedomain": [],        // 过滤的 domain
+    "excludedbatags": "DBA",      // 所有 DBA tag
+    "excludedbadeploytype": [80,81,85,83,82], // 对应了  mysql redis mongodb oracle memcache
+    "http": {
+        "enabled": true,
+        "listen": "0.0.0.0:8080"
+    },
+    "redis": {
+        "enabled": true,    // 是否读 redis , 不读 redis 则不对 redis 主机过期进行检测
+        "server":"",
+        "port": "6379",
+        "maxidle": 20,
+        "maxactive":50,
+        "idletimeout": 60
+    },
+    "falcon": {
+         "falconauth": "",
+         "falconsign": "",
+         "url": "http://falcon-api.vip.vip.com"
+    },
+    "cmdb": {
+        "url": "http://cmdb3.api.vip.com",
+        "sysname": "falcon-server",
+        "token": ""
+    },
+    "pigeon": {
+        "source": "vip-falcon",
+        "key": "",
+        "m3dburl":  "http://m3.api.vip.com/api/getdata",
+        "pigeonurl": "http://pigeon.api.vip.com/alarm/report.do"
+    },
+    "transfer" : {
+        "interval": 10,
+        "servers": [
+            "10.189.20.26:6060",
+            "10.189.20.26:6060",
+            "10.189.20.27:6060"
+        ]
+    },
+    "degrade": {
+        "enabled": true,    // 允许降级
+        "period": 9,        // value 9 ==  10 个时间周期, 每个时间周期为 60 second
+        "alarmlimit":  50,  // 每个时间周期最大只可以报警 50 台服务器，超过则降级
+        "frozentime":  30   // 降级时，停止报警 30 分钟, 这 30 分钟内，只会忽略对应 agent, ping 故障服务器
+    },
+    "proxy": {
+        "servers": [
+            "",
+            "",
+            ""
+        ]
+    }
+}
