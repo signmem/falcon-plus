@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/open-falcon/falcon-plus/modules/alarm/g"
-	"github.com/open-falcon/falcon-plus/modules/alarm/model"
-	"github.com/open-falcon/falcon-plus/modules/alarm/redi"
+	log "github.com/sirupsen/logrus"
+	"github.com/signmem/falcon-plus/modules/alarm/g"
+	"github.com/signmem/falcon-plus/modules/alarm/model"
+	"github.com/signmem/falcon-plus/modules/alarm/redi"
 	"github.com/toolkits/net/httplib"
 )
 

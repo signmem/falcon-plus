@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/open-falcon/falcon-plus/common/redisdb"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/cmdb"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/falcon"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/http"
+	"github.com/signmem/falcon-plus/common/redisdb"
+	"github.com/signmem/falcon-plus/modules/pingcheck/cmdb"
+	"github.com/signmem/falcon-plus/modules/pingcheck/falcon"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/http"
 	"os"
 )
 

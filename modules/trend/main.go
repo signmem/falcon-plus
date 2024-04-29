@@ -3,17 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/trend/register"
+	"github.com/signmem/falcon-plus/modules/trend/register"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"github.com/open-falcon/falcon-plus/common/redisdb"
-	"github.com/open-falcon/falcon-plus/modules/trend/cache"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
-	"github.com/open-falcon/falcon-plus/modules/trend/http"
-	"github.com/open-falcon/falcon-plus/modules/trend/rpc"
-	"github.com/open-falcon/falcon-plus/modules/trend/writer"
+	"github.com/signmem/falcon-plus/common/redisdb"
+	"github.com/signmem/falcon-plus/modules/trend/cache"
+	"github.com/signmem/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/modules/trend/http"
+	"github.com/signmem/falcon-plus/modules/trend/rpc"
+	"github.com/signmem/falcon-plus/modules/trend/writer"
 )
 
 func start_signal(pid int, cfg *g.GlobalConfig) {

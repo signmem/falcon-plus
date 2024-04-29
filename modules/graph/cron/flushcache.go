@@ -1,8 +1,8 @@
 package cron
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/graph/g"
-	"github.com/open-falcon/falcon-plus/modules/graph/index"
+	"github.com/signmem/falcon-plus/modules/graph/g"
+	"github.com/signmem/falcon-plus/modules/graph/index"
 	"time"
 )
 

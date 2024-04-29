@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
-	"github.com/open-falcon/falcon-plus/modules/transfer/http"
-	"github.com/open-falcon/falcon-plus/modules/transfer/proc"
-	"github.com/open-falcon/falcon-plus/modules/transfer/receiver"
-	"github.com/open-falcon/falcon-plus/common/redisdb"
-	"github.com/open-falcon/falcon-plus/modules/transfer/sender"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
+	"github.com/signmem/falcon-plus/modules/transfer/http"
+	"github.com/signmem/falcon-plus/modules/transfer/proc"
+	"github.com/signmem/falcon-plus/modules/transfer/receiver"
+	"github.com/signmem/falcon-plus/common/redisdb"
+	"github.com/signmem/falcon-plus/modules/transfer/sender"
 	"os"
 )
 

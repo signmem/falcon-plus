@@ -1,9 +1,9 @@
 package cmdb
 
 import (
-	"github.com/open-falcon/falcon-plus/common/redisdb"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/tools"
+	"github.com/signmem/falcon-plus/common/redisdb"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/tools"
 	"strconv"
 	"strings"
 	"time"

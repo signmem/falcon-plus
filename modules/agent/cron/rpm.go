@@ -2,7 +2,7 @@ package cron
 
 import (
 	"bytes"
-	"github.com/open-falcon/falcon-plus/modules/agent/g"
+	"github.com/signmem/falcon-plus/modules/agent/g"
 	"io"
 	"log"
 	"net/http"

@@ -2,8 +2,8 @@ package http
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
-	httpclient "github.com/open-falcon/falcon-plus/common/http"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
+	httpclient "github.com/signmem/falcon-plus/common/http"
 	"io/ioutil"
 	"strings"
 	"time"

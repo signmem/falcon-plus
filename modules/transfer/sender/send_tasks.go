@@ -3,10 +3,10 @@ package sender
 import (
 	"bytes"
 
-	"github.com/Shopify/sarama" // added by vincent.zhang for sending to kafka
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
-	"github.com/open-falcon/falcon-plus/modules/transfer/proc"
+	"github.com/IBM/sarama" // added by vincent.zhang for sending to kafka
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
+	"github.com/signmem/falcon-plus/modules/transfer/proc"
 	nsema "github.com/toolkits/concurrent/semaphore"
 	"github.com/toolkits/container/list"
 	"log"

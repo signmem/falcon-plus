@@ -2,7 +2,7 @@ package g
 
 import (
 	"fmt"
-	// log "github.com/Sirupsen/logrus"
+	// log "github.com/sirupsen/logrus"
 	"github.com/lestrrat/go-file-rotatelogs"
 	"github.com/coreos/go-log/log"
 	"time"

@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 
 	"github.com/gin-gonic/gin"
-	"github.com/open-falcon/falcon-plus/modules/api/app/model/uic"
-	"github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/app/model/uic"
+	"github.com/signmem/falcon-plus/modules/api/config"
 	"github.com/spf13/viper"
 )
 

@@ -2,10 +2,10 @@ package falcon
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/cmdb"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/net"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/pigeon"
+	"github.com/signmem/falcon-plus/modules/pingcheck/cmdb"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/net"
+	"github.com/signmem/falcon-plus/modules/pingcheck/pigeon"
 	"os"
 	"strconv"
 )

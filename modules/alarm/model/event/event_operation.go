@@ -7,12 +7,12 @@ import (
 	"database/sql"
 
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/astaxie/beego/orm"
 	"github.com/garyburd/redigo/redis"
-	coommonModel "github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/common/utils"
-	"github.com/open-falcon/falcon-plus/modules/alarm/g"
+	coommonModel "github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/alarm/g"
 )
 
 const timeLayout = "2006-01-02 15:04:05"

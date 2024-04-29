@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
-	"github.com/open-falcon/falcon-plus/modules/trend/writer"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/modules/trend/writer"
 )
 
 type NewFunction func(key int64, pk string, val *model.TrendItem) interface{}

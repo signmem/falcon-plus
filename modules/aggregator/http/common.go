@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/aggregator/g"
+	"github.com/signmem/falcon-plus/modules/aggregator/g"
 	"github.com/toolkits/file"
 	"net/http"
 	"strings"

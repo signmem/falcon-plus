@@ -1,10 +1,10 @@
 package register
 
 import (
-	"github.com/open-falcon/falcon-plus/common/redisdb"
-	"github.com/open-falcon/falcon-plus/common/utils"
-	"github.com/open-falcon/falcon-plus/modules/trend/proc"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/common/redisdb"
+	"github.com/signmem/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/trend/proc"
+	"github.com/signmem/falcon-plus/modules/trend/g"
 	"time"
 )
 

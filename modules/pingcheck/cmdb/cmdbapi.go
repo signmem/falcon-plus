@@ -2,8 +2,8 @@ package cmdb
 
 import (
 
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/tools"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/tools"
 	"encoding/json"
 	"io/ioutil"
 )

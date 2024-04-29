@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/open-falcon/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/common/model"
 	"log"
 )
 

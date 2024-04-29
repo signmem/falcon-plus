@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/trend/proc"
+	"github.com/signmem/falcon-plus/modules/trend/proc"
 	"io"
 	"net/http"
 )

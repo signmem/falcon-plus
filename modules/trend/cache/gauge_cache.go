@@ -2,8 +2,8 @@ package cache
 
 import (
 	"sync"
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/trend/g"
 )
 
 type GaugeItem struct {

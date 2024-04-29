@@ -8,13 +8,13 @@ import (
 	"net/http"
 	"time"
 
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
+	cmodel "github.com/signmem/falcon-plus/common/model"
 	tsema "github.com/toolkits/concurrent/semaphore"
 	"github.com/toolkits/container/nmap"
 	thttpclient "github.com/toolkits/http/httpclient"
 	ttime "github.com/toolkits/time"
 
-	"github.com/open-falcon/falcon-plus/modules/nodata/g"
+	"github.com/signmem/falcon-plus/modules/nodata/g"
 )
 
 var (

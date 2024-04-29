@@ -1,7 +1,7 @@
 package sender
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 	nlist "github.com/toolkits/container/list"
 )
 

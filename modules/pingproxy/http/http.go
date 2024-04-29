@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/pingproxy/g"
+	"github.com/signmem/falcon-plus/modules/pingproxy/g"
 	"net/http"
 	"log"
 )

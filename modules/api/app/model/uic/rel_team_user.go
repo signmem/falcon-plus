@@ -1,7 +1,7 @@
 package uic
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/config"
 )
 
 type RelTeamUser struct {

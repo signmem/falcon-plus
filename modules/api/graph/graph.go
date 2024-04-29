@@ -3,20 +3,20 @@ package graph
 import (
 	"errors"
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/config"
 	"io/ioutil"
 	"math"
 	"strings"
 	"time"
 
-	backend "github.com/open-falcon/falcon-plus/common/backend_pool"
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
+	backend "github.com/signmem/falcon-plus/common/backend_pool"
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	cutils "github.com/signmem/falcon-plus/common/utils"
 	"github.com/spf13/viper"
 	connp "github.com/toolkits/conn_pool"
-	rpcpool "github.com/toolkits/conn_pool/rpc_conn_pool"
-	"github.com/toolkits/consistent/rings"
-	nset "github.com/toolkits/container/set"
+	rpcpool "github.com/signmem/conn_pool/rpc_conn_pool"
+	"github.com/signmem/consistent/rings"
+	nset "github.com/signmem/container/set"
 )
 
 // 连接池

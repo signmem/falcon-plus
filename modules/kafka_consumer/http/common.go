@@ -2,7 +2,7 @@ package http
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 	"github.com/toolkits/file"
 	"net/http"
 )

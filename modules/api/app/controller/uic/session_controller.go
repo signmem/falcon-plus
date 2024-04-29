@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	h "github.com/open-falcon/falcon-plus/modules/api/app/helper"
-	"github.com/open-falcon/falcon-plus/modules/api/app/model/uic"
-	"github.com/open-falcon/falcon-plus/modules/api/app/utils"
+	h "github.com/signmem/falcon-plus/modules/api/app/helper"
+	"github.com/signmem/falcon-plus/modules/api/app/model/uic"
+	"github.com/signmem/falcon-plus/modules/api/app/utils"
 )
 
 type APILoginInput struct {

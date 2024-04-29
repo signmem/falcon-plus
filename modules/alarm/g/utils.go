@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 
-	log "github.com/Sirupsen/logrus" //modified by vincent.zhang for pigeon
+	log "github.com/sirupsen/logrus" //modified by vincent.zhang for pigeon
 	"github.com/astaxie/beego/orm"
 	"github.com/toolkits/net/httplib"
 )

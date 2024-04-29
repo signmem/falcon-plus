@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"math"
 
-	MUtils "github.com/open-falcon/falcon-plus/common/utils"
+	MUtils "github.com/signmem/falcon-plus/common/utils"
 )
 
 // DsType 即RRD中的Datasource的类型：GAUGE|COUNTER|DERIVE

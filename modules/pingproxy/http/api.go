@@ -2,8 +2,8 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/open-falcon/falcon-plus/modules/pingproxy/g"
-	"github.com/open-falcon/falcon-plus/modules/pingproxy/tools"
+	"github.com/signmem/falcon-plus/modules/pingproxy/g"
+	"github.com/signmem/falcon-plus/modules/pingproxy/tools"
 	"net/http"
 )
 

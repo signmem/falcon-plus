@@ -2,9 +2,9 @@ package cache
 
 import (
 	"time"
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
-	"github.com/open-falcon/falcon-plus/modules/trend/proc"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/modules/trend/proc"
 )
 
 const (

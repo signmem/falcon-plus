@@ -3,7 +3,7 @@ package model
 import (
 	"fmt"
 
-	"github.com/open-falcon/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/common/utils"
 )
 
 type TrendItem struct {

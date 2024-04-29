@@ -1,7 +1,7 @@
 package sender
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
 	nlist "github.com/toolkits/container/list"
 )
 

@@ -1,8 +1,8 @@
 package rpc
 
 import (
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/trend/cache"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/trend/cache"
 )
 
 type Trend int

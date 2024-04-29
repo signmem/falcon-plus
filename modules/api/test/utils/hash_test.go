@@ -3,8 +3,8 @@ package test
 import (
 	"testing"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/open-falcon/falcon-plus/modules/api/app/utils"
+	log "github.com/sirupsen/logrus"
+	"github.com/signmem/falcon-plus/modules/api/app/utils"
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/spf13/viper"
 )

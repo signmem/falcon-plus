@@ -2,7 +2,7 @@ package pigeon
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"strings"
 	"time"
 	"encoding/json"

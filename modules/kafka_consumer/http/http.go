@@ -2,7 +2,7 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 	"net/http"
 	_ "net/http/pprof"
 )

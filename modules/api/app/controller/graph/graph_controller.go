@@ -2,7 +2,7 @@ package graph
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/config"
 	"strconv"
 	"strings"
 	"time"
@@ -11,13 +11,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
-	h "github.com/open-falcon/falcon-plus/modules/api/app/helper"
-	f "github.com/open-falcon/falcon-plus/modules/api/app/model/falcon_portal"
-	m "github.com/open-falcon/falcon-plus/modules/api/app/model/graph"
-	"github.com/open-falcon/falcon-plus/modules/api/app/utils"
-	grh "github.com/open-falcon/falcon-plus/modules/api/graph"
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	cutils "github.com/signmem/falcon-plus/common/utils"
+	h "github.com/signmem/falcon-plus/modules/api/app/helper"
+	f "github.com/signmem/falcon-plus/modules/api/app/model/falcon_portal"
+	m "github.com/signmem/falcon-plus/modules/api/app/model/graph"
+	"github.com/signmem/falcon-plus/modules/api/app/utils"
+	grh "github.com/signmem/falcon-plus/modules/api/graph"
 )
 
 //added by vincent.zhang for screen bug of dashboard

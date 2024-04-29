@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/open-falcon/falcon-plus/modules/nodata/collector"
-	"github.com/open-falcon/falcon-plus/modules/nodata/config"
-	"github.com/open-falcon/falcon-plus/modules/nodata/g"
-	"github.com/open-falcon/falcon-plus/modules/nodata/http"
-	"github.com/open-falcon/falcon-plus/modules/nodata/judge"
+	"github.com/signmem/falcon-plus/modules/nodata/collector"
+	"github.com/signmem/falcon-plus/modules/nodata/config"
+	"github.com/signmem/falcon-plus/modules/nodata/g"
+	"github.com/signmem/falcon-plus/modules/nodata/http"
+	"github.com/signmem/falcon-plus/modules/nodata/judge"
 )
 
 func main() {

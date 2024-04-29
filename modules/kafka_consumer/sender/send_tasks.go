@@ -5,9 +5,9 @@ import (
 	"time"
 
 	pfc "github.com/niean/goperfcounter"
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
 	nsema "github.com/toolkits/concurrent/semaphore"
 	"github.com/toolkits/container/list"
 )

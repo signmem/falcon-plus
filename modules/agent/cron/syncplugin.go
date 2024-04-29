@@ -3,7 +3,7 @@ package cron
 import (
 	"encoding/json"
 	"github.com/zloylos/grsync"
-	"github.com/open-falcon/falcon-plus/modules/agent/g"
+	"github.com/signmem/falcon-plus/modules/agent/g"
 	"github.com/toolkits/file"
 	"golang.org/x/sys/unix"
 	"io/ioutil"

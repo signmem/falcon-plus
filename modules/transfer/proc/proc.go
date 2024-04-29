@@ -1,7 +1,7 @@
 package proc
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
 	nproc "github.com/toolkits/proc"
 	"log"
 )

@@ -6,7 +6,7 @@ import (
 	"net/rpc"
 	"sync"
 	"time"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/modules/trend/g"
 )
 
 type conn_list struct {

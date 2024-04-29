@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	h "github.com/open-falcon/falcon-plus/modules/api/app/helper"
-	m "github.com/open-falcon/falcon-plus/modules/api/app/model/dashboard"
+	h "github.com/signmem/falcon-plus/modules/api/app/helper"
+	m "github.com/signmem/falcon-plus/modules/api/app/model/dashboard"
 	"github.com/spf13/viper"
 )
 

@@ -2,15 +2,15 @@ package cron
 
 import (
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/alarm/api"
-	"github.com/open-falcon/falcon-plus/modules/alarm/g"
-	"github.com/open-falcon/falcon-plus/modules/alarm/redi"
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/alarm/api"
+	"github.com/signmem/falcon-plus/modules/alarm/g"
+	"github.com/signmem/falcon-plus/modules/alarm/redi"
 	//add by vincent.zhang for pigeon
-	"github.com/open-falcon/falcon-plus/common/utils"
-	eventmodel "github.com/open-falcon/falcon-plus/modules/alarm/model/event"
+	"github.com/signmem/falcon-plus/common/utils"
+	eventmodel "github.com/signmem/falcon-plus/modules/alarm/model/event"
 	//end
 )
 

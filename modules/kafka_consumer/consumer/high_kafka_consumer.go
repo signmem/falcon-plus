@@ -3,13 +3,12 @@ package consumer
 import (
 	"errors"
 
-	"github.com/Shopify/sarama"
-	"github.com/bsm/sarama-cluster"
+	"github.com/IBM/sarama"
 	nsema "github.com/toolkits/concurrent/semaphore"
 
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/sender"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/sender"
 )
 
 var (

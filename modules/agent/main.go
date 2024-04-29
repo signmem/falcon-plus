@@ -6,10 +6,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/open-falcon/falcon-plus/modules/agent/cron"
-	"github.com/open-falcon/falcon-plus/modules/agent/funcs"
-	"github.com/open-falcon/falcon-plus/modules/agent/g"
-	"github.com/open-falcon/falcon-plus/modules/agent/http"
+	"github.com/signmem/falcon-plus/modules/agent/cron"
+	"github.com/signmem/falcon-plus/modules/agent/funcs"
+	"github.com/signmem/falcon-plus/modules/agent/g"
+	"github.com/signmem/falcon-plus/modules/agent/http"
 )
 
 func main() {

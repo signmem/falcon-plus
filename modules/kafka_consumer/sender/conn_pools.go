@@ -1,8 +1,8 @@
 package sender
 
 import (
-	backend "github.com/open-falcon/falcon-plus/common/backend_pool"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
+	backend "github.com/signmem/falcon-plus/common/backend_pool"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 	nset "github.com/toolkits/container/set"
 )
 

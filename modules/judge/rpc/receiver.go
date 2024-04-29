@@ -3,9 +3,9 @@ package rpc
 import (
 	"time"
 
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/judge/g"
-	"github.com/open-falcon/falcon-plus/modules/judge/store"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/judge/g"
+	"github.com/signmem/falcon-plus/modules/judge/store"
 )
 
 type Judge int

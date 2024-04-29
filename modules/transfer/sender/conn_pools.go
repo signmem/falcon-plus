@@ -3,8 +3,8 @@ package sender
 import (
 	"log"
 
-	backend "github.com/open-falcon/falcon-plus/common/backend_pool"
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
+	backend "github.com/signmem/falcon-plus/common/backend_pool"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
 	nset "github.com/toolkits/container/set"
 )
 

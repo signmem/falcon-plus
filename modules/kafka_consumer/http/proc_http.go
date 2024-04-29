@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
 	"net/http"
 )
 

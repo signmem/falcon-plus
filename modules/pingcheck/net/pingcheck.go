@@ -1,9 +1,9 @@
 package net
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"github.com/tatsushid/go-fastping"
-	"github.com/open-falcon/falcon-plus/common/http"
+	"github.com/signmem/falcon-plus/common/http"
 	"io/ioutil"
 	"net"
 	"os/exec"

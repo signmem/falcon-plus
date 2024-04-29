@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"github.com/open-falcon/falcon-plus/modules/pingproxy/g"
-	"github.com/open-falcon/falcon-plus/modules/pingproxy/http"
+	"github.com/signmem/falcon-plus/modules/pingproxy/g"
+	"github.com/signmem/falcon-plus/modules/pingproxy/http"
 )
 
 

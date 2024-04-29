@@ -3,7 +3,7 @@ package writer
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/modules/trend/g"
 )
 
 var DB *sql.DB

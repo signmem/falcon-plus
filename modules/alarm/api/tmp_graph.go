@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/open-falcon/falcon-plus/modules/alarm/g"
+	"github.com/signmem/falcon-plus/modules/alarm/g"
 )
 
 type TmpGraphResp struct {

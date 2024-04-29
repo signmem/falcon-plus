@@ -4,12 +4,12 @@ import (
 	"strconv"
 	"strings"
 
-	backend "github.com/open-falcon/falcon-plus/common/backend_pool"
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
-	"github.com/toolkits/consistent/rings"
-	nlist "github.com/toolkits/container/list"
+	backend "github.com/signmem/falcon-plus/common/backend_pool"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/signmem/consistent/rings"
+	nlist "github.com/signmem/container/list"
 )
 
 const (

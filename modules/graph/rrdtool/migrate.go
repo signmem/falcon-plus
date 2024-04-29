@@ -11,12 +11,12 @@ import (
 	"time"
 
 	pfc "github.com/niean/goperfcounter"
-	"github.com/toolkits/consistent"
+	"github.com/signmem/consistent"
 
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
-	"github.com/open-falcon/falcon-plus/modules/graph/g"
-	"github.com/open-falcon/falcon-plus/modules/graph/store"
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	cutils "github.com/signmem/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/graph/g"
+	"github.com/signmem/falcon-plus/modules/graph/store"
 )
 
 const (

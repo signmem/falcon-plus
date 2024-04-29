@@ -6,7 +6,7 @@ import (
 	"net/rpc"
 	"net/rpc/jsonrpc"
 
-	"github.com/open-falcon/falcon-plus/modules/gateway/g"
+	"github.com/signmem/falcon-plus/modules/gateway/g"
 )
 
 func StartRpc() {

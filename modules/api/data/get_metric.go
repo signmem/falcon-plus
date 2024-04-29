@@ -3,9 +3,9 @@ package data
 import (
 	"bufio"
 	"io/ioutil"
-	"github.com/open-falcon/falcon-plus/modules/api/config"
-	"github.com/open-falcon/falcon-plus/common/http"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/common/http"
+	cutils "github.com/signmem/falcon-plus/common/utils"
 	"encoding/json"
 	"os"
 	"time"

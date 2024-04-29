@@ -3,7 +3,7 @@ package sdk
 import (
 	"testing"
 
-	"github.com/open-falcon/falcon-plus/modules/aggregator/g"
+	"github.com/signmem/falcon-plus/modules/aggregator/g"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

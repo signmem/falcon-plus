@@ -2,16 +2,16 @@ package sender
 
 import (
 	"fmt"
-	backend "github.com/open-falcon/falcon-plus/common/backend_pool"
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
-	"github.com/open-falcon/falcon-plus/modules/transfer/proc"
-	rings "github.com/toolkits/consistent/rings"
-	nlist "github.com/toolkits/container/list"
+	backend "github.com/signmem/falcon-plus/common/backend_pool"
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
+	"github.com/signmem/falcon-plus/modules/transfer/proc"
+	rings "github.com/signmem/consistent/rings"
+	nlist "github.com/signmem/container/list"
 	"log"
 	//added by vincent.zhang for sending to kafka
-	//"github.com/Shopify/sarama"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
+	//"github.com/IBM/sarama"
+	cutils "github.com/signmem/falcon-plus/common/utils"
 )
 
 const (

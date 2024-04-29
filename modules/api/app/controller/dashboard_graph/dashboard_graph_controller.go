@@ -2,7 +2,7 @@ package dashboard_graph
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/config"
 	"net/http"
 	"sort"
 	"strconv"
@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
-	h "github.com/open-falcon/falcon-plus/modules/api/app/helper"
-	m "github.com/open-falcon/falcon-plus/modules/api/app/model/dashboard"
+	cutils "github.com/signmem/falcon-plus/common/utils"
+	h "github.com/signmem/falcon-plus/modules/api/app/helper"
+	m "github.com/signmem/falcon-plus/modules/api/app/model/dashboard"
 )
 
 type APITmpGraphCreateReqData struct {

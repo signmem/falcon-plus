@@ -1,9 +1,9 @@
 package sender
 
 import (
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
-	rings "github.com/toolkits/consistent/rings"
+	cutils "github.com/signmem/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
+	rings "github.com/signmem/consistent/rings"
 )
 
 func initNodeRings() {

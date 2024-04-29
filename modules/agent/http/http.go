@@ -7,7 +7,7 @@ import (
 	_ "net/http/pprof"
 	"strings"
 
-	"github.com/open-falcon/falcon-plus/modules/agent/g"
+	"github.com/signmem/falcon-plus/modules/agent/g"
 )
 
 type Dto struct {

@@ -4,13 +4,13 @@ package consumer
 import (
 	"errors"
 	"time"
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	nsema "github.com/toolkits/concurrent/semaphore"
-	"github.com/wvanbergen/kafka/consumergroup"
+	"github.com/signmem/kafka/consumergroup"
 	"github.com/wvanbergen/kazoo-go"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/sender"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/sender"
 )
 
 var (

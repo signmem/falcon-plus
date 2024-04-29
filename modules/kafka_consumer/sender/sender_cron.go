@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
 	"github.com/toolkits/container/list"
 )
 

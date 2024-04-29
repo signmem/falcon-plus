@@ -2,8 +2,8 @@ package http
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/agent/cron"
-	"github.com/open-falcon/falcon-plus/modules/agent/g"
+	"github.com/signmem/falcon-plus/modules/agent/cron"
+	"github.com/signmem/falcon-plus/modules/agent/g"
 	"net/http"
 )
 

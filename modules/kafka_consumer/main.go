@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/consumer"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/http"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/sender"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/consumer"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/http"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/sender"
 )
 
 func start_signal(pid int, cfg *g.GlobalConfig) {

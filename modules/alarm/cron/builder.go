@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/common/utils"
-	"github.com/open-falcon/falcon-plus/modules/alarm/g"
+	"github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/alarm/g"
 	//add by vincent.zhang fro pigeon
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/toolkits/net/httplib"
 	"regexp"
 	"sort"
@@ -17,8 +17,8 @@ import (
 	"time"
 	//"strings"
 
-	//"github.com/open-falcon/falcon-plus/modules/alarm/api"
-	amodel "github.com/open-falcon/falcon-plus/modules/alarm/model"
+	//"github.com/signmem/falcon-plus/modules/alarm/api"
+	amodel "github.com/signmem/falcon-plus/modules/alarm/model"
 	//add end
 )
 

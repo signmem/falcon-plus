@@ -2,9 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/open-falcon/falcon-plus/common/model"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
-	"github.com/open-falcon/falcon-plus/modules/agent/g"
+	"github.com/signmem/falcon-plus/common/model"
+	cutils "github.com/signmem/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/agent/g"
 	"net/http"
 	"regexp"
 	"strings"

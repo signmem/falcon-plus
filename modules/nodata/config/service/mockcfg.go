@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	cutils "github.com/signmem/falcon-plus/common/utils"
 )
 
 type MockCfg struct {

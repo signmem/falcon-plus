@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
-	"github.com/open-falcon/falcon-plus/modules/transfer/proc"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
+	"github.com/signmem/falcon-plus/modules/transfer/proc"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 )
 
 var (

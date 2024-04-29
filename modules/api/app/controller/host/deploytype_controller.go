@@ -3,7 +3,7 @@ package host
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/config"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -12,8 +12,8 @@ import (
 	"unicode"
 
 	"github.com/gin-gonic/gin"
-	h "github.com/open-falcon/falcon-plus/modules/api/app/helper"
-	f "github.com/open-falcon/falcon-plus/modules/api/app/model/falcon_portal"
+	h "github.com/signmem/falcon-plus/modules/api/app/helper"
+	f "github.com/signmem/falcon-plus/modules/api/app/model/falcon_portal"
 )
 
 type APICreateDeployType struct {

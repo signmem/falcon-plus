@@ -2,8 +2,8 @@ package consumer
 
 import (
 	"time"
-	"github.com/Shopify/sarama"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
+	"github.com/IBM/sarama"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 )
 
 const (

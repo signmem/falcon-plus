@@ -1,7 +1,7 @@
 package net
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"net"
 	"time"
 )

@@ -2,8 +2,8 @@ package falcon
 
 import (
 	"fmt"
-	"github.com/open-falcon/falcon-plus/common/redisdb"
-	"github.com/open-falcon/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/common/redisdb"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"sync"
 	"time"
 )

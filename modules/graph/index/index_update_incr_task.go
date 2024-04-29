@@ -2,14 +2,14 @@ package index
 
 import (
 	"database/sql"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"time"
 
 	nsema "github.com/toolkits/concurrent/semaphore"
 	ntime "github.com/toolkits/time"
 
-	"github.com/open-falcon/falcon-plus/modules/graph/g"
-	proc "github.com/open-falcon/falcon-plus/modules/graph/proc"
+	"github.com/signmem/falcon-plus/modules/graph/g"
+	proc "github.com/signmem/falcon-plus/modules/graph/proc"
 )
 
 const (

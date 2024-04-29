@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/open-falcon/falcon-plus/modules/aggregator/g"
+	"github.com/signmem/falcon-plus/modules/aggregator/g"
 )
 
 type Worker struct {

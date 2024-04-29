@@ -1,8 +1,8 @@
 package falcon_portal
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/api/app/model/uic"
-	con "github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/app/model/uic"
+	con "github.com/signmem/falcon-plus/modules/api/config"
 )
 
 type Template struct {

@@ -2,7 +2,7 @@ package proc
 
 import (
 	nproc "github.com/toolkits/proc"
-	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 )
 
 // 统计指标的整体数据

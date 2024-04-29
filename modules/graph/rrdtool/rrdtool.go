@@ -7,12 +7,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
+	cmodel "github.com/signmem/falcon-plus/common/model"
 	"github.com/open-falcon/rrdlite"
 	"github.com/toolkits/file"
 
-	"github.com/open-falcon/falcon-plus/modules/graph/g"
-	"github.com/open-falcon/falcon-plus/modules/graph/store"
+	"github.com/signmem/falcon-plus/modules/graph/g"
+	"github.com/signmem/falcon-plus/modules/graph/store"
 )
 
 var (

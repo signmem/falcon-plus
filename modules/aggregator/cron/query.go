@@ -1,7 +1,7 @@
 package cron
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/aggregator/sdk"
+	"github.com/signmem/falcon-plus/modules/aggregator/sdk"
 )
 
 func queryCounterLast(numeratorOperands, denominatorOperands, hostnames []string, begin, end int64) (map[string]float64, error) {

@@ -2,7 +2,7 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/open-falcon/falcon-plus/modules/agent/g"
+	"github.com/signmem/falcon-plus/modules/agent/g"
 	"io/ioutil"
 	"net/http"
 	"strconv"

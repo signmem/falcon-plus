@@ -3,7 +3,7 @@ package cache
 import (
 	"sort"
 	"time"
-	"github.com/open-falcon/falcon-plus/modules/trend/g"
+	"github.com/signmem/falcon-plus/modules/trend/g"
 	nsema "github.com/toolkits/concurrent/semaphore"
 
 	"github.com/toolkits/cron"

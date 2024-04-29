@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/open-falcon/falcon-plus/modules/api/config"
+	"github.com/signmem/falcon-plus/modules/api/config"
 	"github.com/spf13/viper"
 	"github.com/toolkits/str"
 )

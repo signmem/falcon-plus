@@ -2,12 +2,12 @@ package rpc
 
 import (
 	"fmt"
-	cmodel "github.com/open-falcon/falcon-plus/common/model"
-	"github.com/open-falcon/falcon-plus/common/redisdb"
-	cutils "github.com/open-falcon/falcon-plus/common/utils"
-	"github.com/open-falcon/falcon-plus/modules/transfer/g"
-	"github.com/open-falcon/falcon-plus/modules/transfer/proc"
-	"github.com/open-falcon/falcon-plus/modules/transfer/sender"
+	cmodel "github.com/signmem/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/common/redisdb"
+	cutils "github.com/signmem/falcon-plus/common/utils"
+	"github.com/signmem/falcon-plus/modules/transfer/g"
+	"github.com/signmem/falcon-plus/modules/transfer/proc"
+	"github.com/signmem/falcon-plus/modules/transfer/sender"
 	"log"
 	"regexp"
 	"strconv"

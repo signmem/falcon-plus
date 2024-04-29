@@ -2,7 +2,7 @@ package g
 
 import (
 	"bytes"
-	"github.com/open-falcon/falcon-plus/common/model"
+	"github.com/signmem/falcon-plus/common/model"
 	"github.com/toolkits/slice"
 	"log"
 	"os"

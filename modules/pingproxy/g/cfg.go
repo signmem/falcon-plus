@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 	"encoding/json"
-	"github.com/open-falcon/falcon-plus/modules/pingproxy/tools"
+	"github.com/signmem/falcon-plus/modules/pingproxy/tools"
 )
 
 var (
