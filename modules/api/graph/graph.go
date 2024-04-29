@@ -14,9 +14,9 @@ import (
 	cutils "github.com/signmem/falcon-plus/common/utils"
 	"github.com/spf13/viper"
 	connp "github.com/toolkits/conn_pool"
-	rpcpool "github.com/signmem/conn_pool/rpc_conn_pool"
+	rpcpool "github.com/toolkits/conn_pool/rpc_conn_pool"
 	"github.com/signmem/consistent/rings"
-	nset "github.com/signmem/container/set"
+	nset "github.com/toolkits/container/set"
 )
 
 // 连接池

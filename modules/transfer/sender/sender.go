@@ -7,7 +7,7 @@ import (
 	"github.com/signmem/falcon-plus/modules/transfer/g"
 	"github.com/signmem/falcon-plus/modules/transfer/proc"
 	rings "github.com/signmem/consistent/rings"
-	nlist "github.com/signmem/container/list"
+	nlist "github.com/toolkits/container/list"
 	"log"
 	//added by vincent.zhang for sending to kafka
 	//"github.com/IBM/sarama"

@@ -9,7 +9,7 @@ import (
 	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
 	"github.com/signmem/consistent/rings"
-	nlist "github.com/signmem/container/list"
+	nlist "github.com/toolkits/container/list"
 )
 
 const (
