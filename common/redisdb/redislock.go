@@ -1,7 +1,7 @@
 package redisdb
 
 import (
-	"github.com/gsm/redislock"
+	"github.com/signmem/redislock"
 	redis9 "github.com/redis/go-redis/v9"
 	"context"
 	"time"
