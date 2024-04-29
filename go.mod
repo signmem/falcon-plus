@@ -6,14 +6,14 @@ require (
 	github.com/DeanThompson/ginpprof v0.0.0-20201112072838-007b1e56b2e1
 	github.com/IBM/sarama v1.43.2
 	github.com/ShellCode33/VM-Detection v0.0.0-20200304230940-4fd05cb2aa47
-	github.com/astaxie/beego v1.12.3
+	github.com/astaxie/beego v1.10.1
 	github.com/coreos/go-log v0.0.0-20180308165134-b22fd89e1882
 	github.com/emirpasic/gods v1.18.1
 	github.com/facebookgo/atomicfile v0.0.0-20151019160806-2de1f203e7d5
 	github.com/garyburd/redigo v1.6.4
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.8.1
-	github.com/gomodule/redigo v2.0.0+incompatible
+	github.com/gomodule/redigo v1.9.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/masato25/yaag v0.0.0-20170704095552-00862ec4db8e
@@ -50,9 +50,11 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eapache/go-resiliency v1.6.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
@@ -101,6 +103,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
+	github.com/redis/go-redis/v9 v9.5.1 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414 // indirect

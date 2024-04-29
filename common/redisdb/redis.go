@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gomodule/redigo/redis"
+	redis9 "github.com/redis/go-redis/v9"
 	"os"
 	"os/signal"
 	"syscall"
@@ -53,3 +54,20 @@ func CleanupHook() {
     }()
 }
 
+func RedisClient(maxidle int, maxactive int, server string) (client *redis9.Client, err error) {
+	client = redis9.NewClient(&redis9.Options{
+		Addr: 				server,
+		Password: 			"",
+		DB: 				0,
+		MaxIdleConns: 		maxidle,
+		MaxActiveConns: 	maxactive,
+	})
+
+	ctx := context.Background()
+	_, err = client.Ping(ctx).Result()
+	if err != nil {
+		return client, err
+	}
+
+	return client,  nil
+}

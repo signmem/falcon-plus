@@ -3,6 +3,7 @@ package redisdb
 import (
     "fmt"
     "github.com/gomodule/redigo/redis"
+
 )
 
 func Ping() error {
@@ -16,6 +17,7 @@ func Ping() error {
     }
     return nil
 }
+
 
 func Get(key string) ([]byte, error) {
 	// 获取某个 key 的值
