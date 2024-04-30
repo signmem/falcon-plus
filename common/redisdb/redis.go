@@ -64,7 +64,9 @@ func RedisClient(maxidle int, maxactive int, server string) (client *redis9.Clie
 	})
 
 	ctx := context.Background()
+
 	_, err = client.Ping(ctx).Result()
+
 	if err != nil {
 		return client, err
 	}
