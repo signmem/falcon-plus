@@ -51,7 +51,7 @@ func main() {
 	go cron.ConsumeSms()
 	go cron.ConsumeMail()
 	go cron.ConsumePigeon() //add by vincent.zhang for pigeon
-	go cron.CleanExpiredEvent()
+	// go cron.CleanExpiredEvent()  ( remove by terry.zeng #141 )
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
