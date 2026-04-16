@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/signmem/falcon-plus/modules/agent/cron"
 	"github.com/signmem/falcon-plus/modules/agent/funcs"
@@ -20,6 +22,8 @@ func main() {
 	showpid := flag.Bool("showpid",false, "show process pid")
 
 	flag.Parse()
+
+	signal.Ignore(syscall.SIGURG)
 
 	if *version {
 		pluginInfo := g.GetVersionFileInfo()
@@ -47,6 +51,7 @@ func main() {
 	g.ParseConfig(*cfg)
 	g.VersionDir = g.Config().Plugin.Dir + "/version"
 	g.VersionFile = g.VersionDir + "/version"
+	g.Hostname()
 	g.InitLog()
 
 	// g.WritePid()  ## write pid to pidfile setting. not necessary. terry.zeng
@@ -66,8 +71,9 @@ func main() {
 	go cron.SyncPlugin()       // use to rsync to sync plugin
 	go cron.ReInitLocalIp()    // retry to get ipaddr every day
 	go cron.GetMetricCount()
+	go cron.AgentAlive()           // agent.alive metrics (15s)
 	cron.ReportAgentStatus()
-	cron.SyncMinePlugins()
+	cron.SyncMinePlugins()      // sync plugin from hbs
 	cron.SyncBuiltinMetrics()
 	cron.SyncTrustableIps()
 	cron.Collect()

@@ -71,13 +71,30 @@ curl http://localhost:22230/version
 10-32 为本机执行 cron job 同步 plugin 时间即 10:32 每天执行
 20200908144442 plugin version    
 ```
+
 特别注意:
 
+* 当无法访问到 nginx 服务器，则版本信息如下 (方便从 db 中获取异常主机而设计)  
+* 同样，假如 nginx 维护问题，格式按上述规格填写 json 格式，也会返回下面信息  
+* dns 无法解析 falcon-plugin.vip.vip.com   
+
 ```
-当无法访问到 nginx 服务器，则版本信息如下 (方便从 db 中获取异常主机而设计)  
-同样，假如 nginx 维护问题，格式按上述规格填写 json 格式，也会返回下面信息  
 {"msg":"success","data":{"falcon-agent":"5.1.6_20200909","falcon-plugin":"16-44@plugin_http_access_error"}}
+
+db 显示 17-01@plugin_http_access_error
 ```
+
+* 当无法访问 rsync server 出现下面错误  
+
+```
+curl http://localhost:22230/plugin/update
+SyncPlugin() error, sync plugin error
+
+
+db 显示  13-11@sync_plugin_error
+
+```
+
 
 # agent cronjob 更新
 
@@ -127,7 +144,8 @@ success
 ```
 
 # 异常:  
-返回下面信息都表明 agent 无法连接到 nginx 或无法从 nginx 获取正确信息  
+
+* 返回下面信息都表明 agent 无法连接到 nginx 或无法从 nginx 获取正确信息   
 
 ```
 curl http://localhost:22230/version
@@ -140,3 +158,10 @@ curl http://localhost:22230/plugin/update
 plugin_http_access_error
 
 ```
+
+* 当 /etc/sudoers 中配置了 requiretty 缺没有配置 root 则出现下面错误   
+
+```
+db 显示为  11-32@chown_plugin_dir_error_after_rsync
+```
+

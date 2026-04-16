@@ -14,6 +14,7 @@ type TimeStruct struct {
 type RsyncResponse struct {
 	Server       []string   `json:"server"`
 	Source       string     `json:"source"`
+	GreyIpList   []string   `json:"greyip"`
 	Sync         bool       `json:"sync"`
 	SyncSrc      string     `json:"syncsrc"`
 	SyncPort     string     `json:"port"`

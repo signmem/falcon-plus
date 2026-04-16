@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/signmem/falcon-plus/modules/agent/g"
-	"github.com/toolkits/file"
+	"github.com/signmem/file"
 	"net/http"
 	"os"
 	"time"
@@ -22,12 +22,9 @@ func configAdminRoutes() {
 	})
 
 	http.HandleFunc("/config/reload", func(w http.ResponseWriter, r *http.Request) {
-		if g.IsTrustable(r.RemoteAddr) {
-			g.ParseConfig(g.ConfigFile)
-			RenderDataJson(w, g.Config())
-		} else {
-			w.Write([]byte("no privilege"))
-		}
+		g.InitPoolAndVMTags()
+		g.Hostname()
+		w.Write([]byte("success.."))
 	})
 
 	http.HandleFunc("/workdir", func(w http.ResponseWriter, r *http.Request) {

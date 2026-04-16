@@ -9,8 +9,8 @@ import (
 
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/agent/g"
-	"github.com/toolkits/file"
-	"github.com/toolkits/sys"
+	"github.com/signmem/file"
+	"github.com/signmem/sys"
 )
 
 func UrlMetrics() (L []*model.MetricValue) {
@@ -19,10 +19,9 @@ func UrlMetrics() (L []*model.MetricValue) {
 	if sz == 0 {
 		return
 	}
-	hostname, err := g.Hostname()
-	if err != nil {
-		hostname = "None"
-	}
+
+	hostname := g.HostName
+
 	for furl, timeout := range reportUrls {
 		tags := fmt.Sprintf("url=%v,timeout=%v,src=%v", furl, timeout, hostname)
 		if ok, _ := probeUrl(furl, timeout); !ok {

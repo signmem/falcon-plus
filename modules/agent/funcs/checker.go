@@ -2,8 +2,8 @@ package funcs
 
 import (
 	"fmt"
-	"github.com/toolkits/nux"
-	"github.com/toolkits/sys"
+	"github.com/signmem/nux"
+	"github.com/signmem/sys"
 )
 
 func CheckCollector() {
@@ -24,6 +24,7 @@ func CheckCollector() {
 	output["cpustat "] = procStatErr == nil
 	output["disk.io "] = listDiskErr == nil
 	output["memory  "] = len(MemMetrics()) > 0
+	output["dentry  "] = len(DentryMetrics()) > 0
 	output["netstat "] = len(NetstatMetrics()) > 0
 	output["ss -s   "] = len(SocketStatSummaryMetrics()) > 0
 	output["ss -tln "] = listeningPortsErr == nil && len(ports) > 0

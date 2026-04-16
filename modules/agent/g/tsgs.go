@@ -8,7 +8,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"github.com/ShellCode33/VM-Detection/vmdetect"
+	"github.com/signmem/VM-Detection/vmdetect"
 	"encoding/json"
 )
 
@@ -36,12 +36,14 @@ func InitPoolAndVMTags() {
 	defer f.Close()
 
 	br  := bufio.NewReader(f)
+
 	for {
 		a, _, c := br.ReadLine()
 		if c == io.EOF {
 			break
 		}
 		match , err := regexp.MatchString("pool_name", string(a))
+
 		if err != nil {
 			log.Printf("[ERROR] InitPoolTags() match string error", err)
 			return

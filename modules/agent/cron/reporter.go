@@ -1,7 +1,6 @@
 package cron
 
 import (
-	"fmt"
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/agent/g"
 	"log"
@@ -18,13 +17,9 @@ func ReportAgentStatus() {
 func reportAgentStatus(interval time.Duration) {
 	for {
 		// use to replace space in hostname strings . edit by terry.zeng
-		tmpHostname, err := g.Hostname()
+		tmpHostname := g.HostName
 		replacer := strings.NewReplacer( " ", "", "\t", "" )
 		hostname := replacer.Replace(tmpHostname)
-
-		if err != nil {
-			hostname = fmt.Sprintf("error:%s", err.Error())
-		}
 
 		req := model.AgentReportRequest{
 			Hostname:      hostname,
@@ -34,7 +29,7 @@ func reportAgentStatus(interval time.Duration) {
 		}
 
 		var resp model.SimpleRpcResponse
-		err = g.HbsClient.Call("Agent.ReportStatus", req, &resp)
+		err := g.HbsClient.Call("Agent.ReportStatus", req, &resp)
 		if err != nil || resp.Code != 0 {
 			log.Println("call Agent.ReportStatus fail:", err, "Request:", req, "Response:", resp)
 		}

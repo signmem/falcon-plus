@@ -3,7 +3,7 @@ package g
 import (
 	"bytes"
 	"fmt"
-	"github.com/toolkits/file"
+	"github.com/signmem/file"
 	"io/ioutil"
 	"log"
 	"net"
@@ -184,14 +184,16 @@ func GetCurrPluginVersion() string {
 
 func ChownPluginDir(dirString string) bool {
 	cmd := exec.Command("sudo", "chown", "apps:apps", "-R", dirString)
-	var out bytes.Buffer
-	cmd.Stdout = &out
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
+		log.Printf("[ERROR] chown err: %s", err)
+		log.Printf("[DEBUG] ChownPluginDir() stderr: %s", string(stderr.Bytes()))
 		return false
 	}
 	return true
-
 }
 
 func CheckOSVersion() ( version string ) {

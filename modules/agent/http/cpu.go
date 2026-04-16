@@ -3,7 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/signmem/falcon-plus/modules/agent/funcs"
-	"github.com/toolkits/nux"
+	"github.com/signmem/nux"
 	"net/http"
 	"runtime"
 )

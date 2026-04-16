@@ -2,9 +2,9 @@ package cron
 
 import (
 	"encoding/json"
-	"github.com/zloylos/grsync"
 	"github.com/signmem/falcon-plus/modules/agent/g"
-	"github.com/toolkits/file"
+	"github.com/signmem/file"
+	"github.com/zloylos/grsync"
 	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"log"
@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -30,7 +31,7 @@ func RsyncRequests() (g.RsyncResponse, error) {
 	request, err := http.Get(httpurl)
 
 	if err != nil {
-		log.Println("RsyncRequests() http access error. ", err)
+		log.Printf("RsyncRequests() http access error: %s.\n", err)
 		return rsyncHttpBody, err
 	}
 
@@ -53,12 +54,19 @@ func CheckIP(httpResponse g.RsyncResponse) bool {
 	networkRange := httpResponse.Source
 	_, subnet, _ := net.ParseCIDR(networkRange)
 	myIPAddr := net.ParseIP(g.LocalIp)
-	if subnet.Contains(myIPAddr) {
-		return true
-	}else {
+	if  len(httpResponse.GreyIpList) > 0 {
+		for _, ip := range httpResponse.GreyIpList {
+			if ip == g.LocalIp {
+				return true
+			}
+		}
 		return false
 	}
 
+	if subnet.Contains(myIPAddr) {
+		return true
+	}
+	return false
 
 }
 
@@ -147,7 +155,24 @@ func DoUpdateRpmNow(syncHttpResponse g.RsyncResponse, force bool) bool {
 				return false
 			}
 		}
+	} else {
+		logFile := g.Config().LogFile
+		logDir := filepath.Dir(logFile)
+		plugDir := g.Config().Plugin.Dir
+
+		if logDir == "" || logDir == "/" || logDir == "." {
+			log.Printf("ERROR: log dir chown error %s", logFile)
+		} else {
+			g.ChownPluginDir(logDir)
+		}
+
+		if plugDir == "" || plugDir == "/" || plugDir == "." {
+			log.Printf("ERROR: plugin dir chown error %s", logFile)
+		} else {
+			g.ChownPluginDir(plugDir)
+		}
 	}
+
 	log.Println("INFO: rpm update not needed")
 	return false
 }
@@ -241,7 +266,7 @@ func SyncPlugin() {
 			}
 
 
-			_ = DoUpdateRpmNow(rsyncHttpResponse, force)
+			// _ = DoUpdateRpmNow(rsyncHttpResponse, force)
 
 			_, status := DoSyncPluginNow(rsyncHttpResponse, syncDelete, force)
 			if status == false {

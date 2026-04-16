@@ -20,6 +20,7 @@ func ReInitLocalIp() {
 				log.Println("[DEBUG] Local ip is: ", g.LocalIp )
 			}
 			g.InitLocalIp()
+			g.Hostname()
 			g.InitPoolAndVMTags()   // reinitial g.POOLNAME  variable
 		}
 		time.Sleep(time.Second * 60)

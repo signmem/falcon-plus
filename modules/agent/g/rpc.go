@@ -1,7 +1,7 @@
 package g
 
 import (
-	"github.com/toolkits/net"
+	"github.com/signmem/netlib"
 	"log"
 	"math"
 	"net/rpc"
@@ -36,9 +36,11 @@ func (this *SingleConnRpcClient) serverConn() error {
 			return nil
 		}
 
-		this.rpcClient, err = net.JsonRpcClient("tcp", this.RpcServer, this.Timeout)
+		this.rpcClient, err = netlib.JsonRpcClient("tcp", this.RpcServer, this.Timeout)
 		if err != nil {
-			log.Printf("dial %s fail: %v", this.RpcServer, err)
+
+			log.Printf("dial %s fail: %v\n", this.RpcServer, err)
+
 			if retry > 3 {
 				return err
 			}

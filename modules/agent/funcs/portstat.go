@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/agent/g"
-	"github.com/toolkits/nux"
-	"github.com/toolkits/slice"
+	"github.com/signmem/nux"
+	"github.com/signmem/slice"
 	"log"
 )
 

@@ -30,10 +30,7 @@ func syncBuiltinMetrics() {
 		var procs = make(map[string]map[int]string)
 		var urls = make(map[string]string)
 
-		hostname, err := g.Hostname()
-		if err != nil {
-			continue
-		}
+		hostname := g.HostName
 
 		req := model.AgentHeartbeatRequest{
 			Hostname: hostname,
@@ -41,7 +38,7 @@ func syncBuiltinMetrics() {
 		}
 
 		var resp model.BuiltinMetricResponse
-		err = g.HbsClient.Call("Agent.BuiltinMetrics", req, &resp)
+		err := g.HbsClient.Call("Agent.BuiltinMetrics", req, &resp)
 		if err != nil {
 			log.Println("syncBuiltinMetrics() ERROR:", err)
 			continue

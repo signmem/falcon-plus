@@ -3,7 +3,7 @@ package funcs
 import (
 	"fmt"
 	"github.com/signmem/falcon-plus/common/model"
-	"github.com/toolkits/nux"
+	"github.com/signmem/nux"
 	"log"
 	"strings"
 	"sync"

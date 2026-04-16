@@ -17,12 +17,14 @@ func BuildMappers() {
 	Mappers = []FuncsAndInterval{
 		{
 			Fs: []func() []*model.MetricValue{
-				AgentMetrics,
+
 				CpuMetrics,
 				NetMetrics,
 				KernelMetrics,
 				LoadAvgMetrics,
+				PingMetrics,
 				MemMetrics,
+				DentryMetrics,
 				DiskIOMetrics,
 				IOStatsMetrics,
 				NetstatMetrics,

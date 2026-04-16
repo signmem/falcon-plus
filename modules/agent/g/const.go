@@ -35,10 +35,17 @@ import (
 //    支持 kubevirt 增加  tags -> family=virtul 功能   
 //    对 22230/v1/push 接口上报数据进行 tags, metric 字符标准化
 //    增加检测 /etc/vip-vm-monitor.conf 是否对 swap 进行监控
-
+//
+// 5.3.2 
+//    suppport prometheus metrics 
+//
+// 5.4.0
+//    support  snmp metrics
+//
+//
 
 const (
-	VERSION          = "5.3.1_20221130"
+	VERSION          = "5.4.0_20251128"
 	COLLECT_INTERVAL = time.Second
 	URL_CHECK_HEALTH = "url.check.health"
 	NET_PORT_LISTEN  = "net.port.listen"

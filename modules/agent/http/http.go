@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
+	"runtime"
 	"strings"
 
 	"github.com/signmem/falcon-plus/modules/agent/g"
@@ -16,6 +17,8 @@ type Dto struct {
 }
 
 func init() {
+	configPrometheusRoutes()
+	configSnmpRoutes()
 	configAdminRoutes()
 	configCpuRoutes()
 	configDfRoutes()
@@ -30,6 +33,8 @@ func init() {
 	configSystemRoutes()
 	configCronRoutes()
 	configShowIp()
+	runtime.SetBlockProfileRate(1)
+	runtime.SetMutexProfileFraction(1)
 }
 
 func RenderJson(w http.ResponseWriter, v interface{}) {

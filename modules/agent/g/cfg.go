@@ -2,10 +2,10 @@ package g
 
 import (
 	"encoding/json"
+	"github.com/signmem/file"
 	"log"
 	"os"
 	"sync"
-	"github.com/toolkits/file"
 )
 
 type PluginConfig struct {
@@ -78,17 +78,19 @@ func Config() *GlobalConfig {
 	return config
 }
 
-func Hostname() (string, error) {
-	hostname := Config().Hostname
-	if hostname != "" {
-		return hostname, nil
+func Hostname() () {
+	setHostname := Config().Hostname
+	if setHostname != "" {
+		HostName = setHostname
 	}
 
-	hostname, err := os.Hostname()
+	setHostname, err := os.Hostname()
 	if err != nil {
-		log.Println("ERROR: os.Hostname() fail", err)
+		log.Printf("ERROR: os.Hostname() fail %s", err)
+		HostName = "not-known"
 	}
-	return hostname, err
+
+	HostName = setHostname
 }
 
 func IP() string {
@@ -134,3 +136,74 @@ func ParseConfig(cfg string) {
 
 	log.Println("read config file:", cfg, "successfully")
 }
+
+type PromConfig struct {
+	SslEnable			bool			`json:"ssl_enable"`
+	ServerConfig 		*PromServer		`json:"prometheus"`
+	TLS					*SSLConfig		`json:"tls"`
+	ValidMetricFile		string			`json:"validmetricfile"`
+	CalMetricFile		string			`json:"calmetricfile"`
+	SumMetricFile 		string			`json:"summetricfile"`
+	Step 				int64			`json:"step"`
+	Debug 				bool 			`json:"debug"`
+}
+
+type PromServer struct {
+	Server 			string	`json:"server"`
+	Port 			string	`json:"port"`
+	MetricAPI		string	`json:"metric_api"`
+}
+
+type SSLConfig struct {
+	CaFile 			string		`json:"cafile"`
+	CertFile 		string		`json:"certfile"`
+	KeyFile 		string		`json:"keyfile"`
+}
+
+type MetricCalType struct {
+	MetricSum       string          `json:"metricsum"`
+	MetricCount     string          `json:"metriccount"`
+	MetricName      string          `json:"metricname"`
+}
+
+
+type SnmpServer struct {
+	Debug 			bool 			`json:"debug"`
+	SnmpInfo		*SnmpDetail		`json:"snmpdetail"`
+	SnmpFile 		string 			`json:"snmpfile"`
+}
+
+type SnmpDetail struct {
+	Ipaddr 			string 			`json:"ipaddr"`
+	Port 			uint16 			`json:"port"`
+	Community 		string			`json:"community"`
+	Version 		int				`json:"version"`
+	Timeout 		int64 			`json:"timeout"`
+	Retry 			int 			`json:"retry"`
+	Step 			int64			`json:"step"`
+	HostName 		string			`json:"hostname"`
+}
+
+
+type SnmpOID struct {
+	Oids                    []OIDMAP        `json:"oids"`
+	OidWalks                []OidWalk       `json:"oidwalks"`
+}
+
+type OIDMAP struct {
+	OID     string                  `json:"oid"`
+	Alias   string                  `json:"alias"`
+	Type    string                  `json:"type"`
+}
+
+type OidWalk struct {
+	TagName                         string          `json:"tagname"`
+	TagOid                          string          `json:"tagoid"`
+	Check                           []OIDMAP        `json:"check"`
+}
+
+type OidStruct struct {
+        WalkNum                 string                  `json:"walknum"`
+        WalkReturn              string                  `json:"walkreturn"`
+}
+

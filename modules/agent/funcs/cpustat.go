@@ -2,7 +2,7 @@ package funcs
 
 import (
 	"github.com/signmem/falcon-plus/common/model"
-	"github.com/toolkits/nux"
+	"github.com/signmem/nux"
 	"sync"
 )
 

@@ -37,17 +37,14 @@ func syncMinePlugins() {
 	for {
 		time.Sleep(duration)
 
-		hostname, err := g.Hostname()
-		if err != nil {
-			continue
-		}
+		hostname := g.HostName
 
 		req := model.AgentHeartbeatRequest{
 			Hostname: hostname,
 		}
 
 		var resp model.AgentPluginsResponse
-		err = g.HbsClient.Call("Agent.MinePlugins", req, &resp)
+		err := g.HbsClient.Call("Agent.MinePlugins", req, &resp)
 		if err != nil {
 			log.Println("SyncMinePlugins() ERROR:", err)
 			continue

@@ -3,17 +3,20 @@ package g
 import (
 	"bytes"
 	"github.com/signmem/falcon-plus/common/model"
-	"github.com/toolkits/slice"
+	"github.com/signmem/slice"
 	"log"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 var Root string
+var LocalIp string
+var HostName string
 
 func InitRootDir() {
 	var err error
@@ -22,8 +25,6 @@ func InitRootDir() {
 		log.Fatalln("getwd fail:", err)
 	}
 }
-
-var LocalIp string
 
 func ShellOut(command string)  {
 
@@ -152,7 +153,7 @@ func SendToTransfer(metrics []*model.MetricValue) {
 
 	//var buf bytes.Buffer
 	for i, x := range metrics {
-		if x.Metric == "agent.alive" {
+		if x.Metric == "agent.alive" || x.Metric == "agent.ping" {
 			continue
 		}
 
@@ -280,6 +281,7 @@ func SetReportProcs(procs map[string]map[int]string) {
 	reportProcs = procs
 }
 
+/*
 var (
 	ips     []string
 	ipsLock = new(sync.Mutex)
@@ -297,6 +299,32 @@ func SetTrustableIps(ipStr string) {
 	defer ipsLock.Unlock()
 	ips = arr
 }
+*/
+
+
+var (
+	ipList atomic.Value
+)
+
+func init() {
+	// initial IP
+	ipList.Store([]string{})
+}
+
+// TrustableIps  IP
+func TrustableIps() []string {
+	src := ipList.Load().([]string)
+	dst := make([]string, len(src))
+	copy(dst, src)
+	return dst
+}
+
+// SetTrustableIps  IP
+func SetTrustableIps(ipStr string) {
+	arr := strings.Split(ipStr, ",")
+	ipList.Store(arr)
+}
+
 
 func IsTrustable(remoteAddr string) bool {
 	ip := remoteAddr

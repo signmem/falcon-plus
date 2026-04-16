@@ -2,15 +2,14 @@ package http
 
 import (
 	"github.com/signmem/falcon-plus/modules/agent/g"
-	"github.com/toolkits/nux"
-	"github.com/toolkits/sys"
+	"github.com/signmem/nux"
+	"github.com/signmem/sys"
 	"net/http"
 )
 
 func configKernelRoutes() {
 	http.HandleFunc("/proc/kernel/hostname", func(w http.ResponseWriter, r *http.Request) {
-		data, err := g.Hostname()
-		AutoRender(w, data, err)
+		AutoRender(w, g.HostName, nil)
 	})
 
 	http.HandleFunc("/proc/kernel/maxproc", func(w http.ResponseWriter, r *http.Request) {

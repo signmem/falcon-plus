@@ -16,9 +16,12 @@ package model
 
 import (
 	"fmt"
+	"reflect"
 
 	MUtils "github.com/signmem/falcon-plus/common/utils"
 )
+
+var floatType = reflect.TypeOf(float64(0))
 
 type MetricValue struct {
 	Endpoint  string      `json:"endpoint"`
@@ -29,6 +32,24 @@ type MetricValue struct {
 	Tags      string      `json:"tags"`
 	Timestamp int64       `json:"timestamp"`
 }
+
+
+func (this *MetricValue) Add(value interface{}) ( metric MetricValue) {
+	this.Value = getValueToFloat(this.Value) + getValueToFloat(value)
+	return
+}
+
+
+func getValueToFloat(unk interface{}) (float64) {
+	v := reflect.ValueOf(unk)
+	v = reflect.Indirect(v)
+	if !v.Type().ConvertibleTo(floatType) {
+		return 0
+	}
+	fv := v.Convert(floatType)
+	return fv.Float()
+}
+
 
 func (this *MetricValue) String() string {
 	return fmt.Sprintf(

@@ -5,7 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/agent/g"
-	"github.com/toolkits/nux"
+	"github.com/signmem/nux"
 	"regexp"
 )
 

@@ -3,7 +3,7 @@ package funcs
 import (
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/agent/g"
-	"github.com/toolkits/sys"
+	"github.com/signmem/sys"
 	"log"
 	"strconv"
 	"strings"
