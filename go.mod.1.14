@@ -1,4 +1,4 @@
-module github.com/open-falcon/falcon-plus
+module github.com/signmem/falcon-plus
 
 go 1.14
 
@@ -60,7 +60,7 @@ require (
 	github.com/niean/gotools v0.0.0-20151221085310-ff3f51fc5c60 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
-	github.com/open-falcon/rrdlite v0.0.0-20200214140804-bf5829f786ad
+	github.com/signmem/rrdlite v0.0.0-20200214140804-bf5829f786ad
 	github.com/peterh/liner v1.0.1-0.20171122030339-3681c2a91233 // indirect
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414 // indirect

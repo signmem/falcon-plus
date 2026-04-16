@@ -1,4 +1,4 @@
-module github.com/open-falcon/falcon-plus
+module github.com/signmem/falcon-plus
 
 go 1.18
 
@@ -16,7 +16,7 @@ require (
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/masato25/yaag v0.0.0-20170704095552-00862ec4db8e
 	github.com/niean/goperfcounter v0.0.0-20160108100052-24860a8d3fac
-	github.com/open-falcon/rrdlite v0.0.0-20200214140804-bf5829f786ad
+	github.com/signmem/rrdlite v0.0.0-20200214140804-bf5829f786ad
 	github.com/prometheus/client_model v0.6.0
 	github.com/prometheus/common v0.44.0
 	github.com/redis/go-redis/v9 v9.7.0

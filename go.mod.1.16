@@ -1,4 +1,4 @@
-module github.com/open-falcon/falcon-plus
+module github.com/signmem/falcon-plus
 
 go 1.16
 
@@ -36,7 +36,7 @@ require (
 	github.com/niean/goperfcounter v0.0.0-20160108100052-24860a8d3fac
 	github.com/niean/gotools v0.0.0-20151221085310-ff3f51fc5c60 // indirect
 	github.com/onsi/gomega v1.12.0 // indirect
-	github.com/open-falcon/rrdlite v0.0.0-20170412122036-7d8646c85cc5
+	github.com/signmem/rrdlite v0.0.0-20170412122036-7d8646c85cc5
 	github.com/pierrec/lz4 v0.0.0-20170828192935-08c27939df1b // indirect
 	github.com/pierrec/xxHash v0.0.0-20170714082455-a0006b13c722 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20161128210544-1f30fe9094a5 // indirect
