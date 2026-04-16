@@ -3,7 +3,9 @@ package http
 import (
 	"encoding/json"
 	"github.com/signmem/falcon-plus/modules/pingcheck/g"
+	"github.com/signmem/falcon-plus/modules/pingcheck/selector"
 	"net/http"
+	_ "net/http/pprof"
 	"strings"
 )
 
@@ -15,6 +17,9 @@ type Dto struct {
 
 func init() {
 	healthCheck()
+	agentAlarm()
+	pingAlarm()
+	roleCheck()
 }
 
 func RenderJson(w http.ResponseWriter, v interface{}) {
@@ -77,5 +82,11 @@ func healthCheck() {
 		RenderDataJson(w,map[string]interface{} {
 			"version":  g.Version,
 		})
+	})
+}
+
+func roleCheck() {
+	http.HandleFunc("/api/v1/rolecheck", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(selector.Role))
 	})
 }

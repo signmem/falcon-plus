@@ -3,22 +3,19 @@ module github.com/open-falcon/falcon-plus
 go 1.18
 
 require (
+	github.com/DeanThompson/ginpprof v0.0.0-20201112072838-007b1e56b2e1
 	github.com/astaxie/beego v1.12.3
 	github.com/emirpasic/gods v1.18.1
 	github.com/facebookgo/atomicfile v0.0.0-20151019160806-2de1f203e7d5
 	github.com/garyburd/redigo v1.6.4
-	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/gosnmp/gosnmp v1.29.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/masato25/yaag v0.0.0-20170704095552-00862ec4db8e
 	github.com/niean/goperfcounter v0.0.0-20160108100052-24860a8d3fac
 	github.com/open-falcon/rrdlite v0.0.0-20200214140804-bf5829f786ad
-	github.com/prometheus/client_model v0.6.0
-	github.com/prometheus/common v0.44.0
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/signmem/VM-Detection v0.0.0-20241205085638-790402faf36c
@@ -26,8 +23,7 @@ require (
 	github.com/signmem/file v0.0.0-20241205062615-8a57adbcc6d5
 	github.com/signmem/go-log v0.0.0-20240403024112-86a3635680b9
 	github.com/signmem/kafka v0.0.0-20241204035601-1e29a9cfcd08
-	github.com/signmem/netlib v1.0.1
-	github.com/signmem/nux v1.2.0
+	github.com/signmem/nux v0.0.0-20241205103652-0ecc647ee9ca
 	github.com/signmem/redislock v0.0.0-20240429073207-03e83a3aa6eb
 	github.com/signmem/sarama v0.0.0-20241204033045-f7fcfef3ca58
 	github.com/signmem/sarama-cluster v0.0.0-20241204035012-182d8387677e
@@ -74,7 +70,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
@@ -93,7 +88,6 @@ require (
 	github.com/lestrrat/go-strftime v0.0.0-20180220042222-ba3bf9c1d042 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -117,10 +111,10 @@ require (
 	github.com/ugorji/go/codec v1.2.9 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	golang.org/x/crypto v0.5.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

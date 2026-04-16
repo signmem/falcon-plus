@@ -28,22 +28,9 @@ func GenPigeonAlarmData(alarminfo Alarm) Alarms {
 	// event := "falcon agent异常"
 	// metric := "agent.alive"
 
-
-	var message string
-
 	subject := GenAlarmSubject(alarminfo)
 	smsSubject := GenSmsSubject(alarminfo)
 	transfer := GenFalconView(alarminfo)
-
-	var MyFID string
-	MyFID = ""
-
-	if alarminfo.Metric == "falcon.pingcheck.degrade" {
-		message = alarminfo.Message
-                MyFID = "67300"
-	} else {
-		message = GenAlarmMesage(alarminfo)
-	}
 
 	timeStr := time.Now().Format("2006-01-02 15:04:05")
 	rightArgs := &ExtArg{ Name : "right_value", Value: alarminfo.Value}
@@ -56,21 +43,13 @@ func GenPigeonAlarmData(alarminfo Alarm) Alarms {
 
 	var report Alarms
 
-	if alarminfo.Metric == "agent.alive" {
-		MyFID = "14237"
-	}
-
-	if alarminfo.Metric == "agent.ping" {
-		MyFID = "66043"
-	}
-
 	report = Alarms {
-		Fid : MyFID,
-		AlarmCode : "122-000",
+		Fid : alarminfo.Fid,
+		AlarmCode : alarminfo.AlarmCode,
 		Value: alarminfo.Value,
 		Subject: subject,
 		Sms: smsSubject,
-		Message: message,
+		Message: alarminfo.Message,
 		Priority: alarminfo.Priority,
 		Host: alarminfo.Ip,
 		HostName: alarminfo.Hostname,
@@ -84,7 +63,7 @@ func GenPigeonAlarmData(alarminfo Alarm) Alarms {
 }
 
 func LogPigeonAlarm(alarminfo Alarms, pigeonID string ) {
-	g.Logger.Infof("[pigeon 返回信息] LogPigeonAlarm() id: %s 详细信息: %s",
+	g.Alarmer.Infof("[pigeon 返回信息] LogPigeonAlarm() id: %s 详细信息: %s",
 		pigeonID, alarminfo.Message)
 }
 
@@ -106,18 +85,18 @@ func SendPigeonAlarm(p Alarm) (err error){
 	pigeonUrl := g.Config().Pigeon.PigeonUrl
 
 	if g.Config().Debug {
-		g.Logger.Debugf("[发送 pigeon 告警] SendPigeonAlarm() 向 pigeon 发送的告警信息: %v", string(reportBytes))
+		g.Alarmer.Debugf("[发送 pigeon 告警] SendPigeonAlarm() 向 pigeon 发送的告警信息: %v", string(reportBytes))
 	}
 
 	resp, err := tools.HttpApiPost(pigeonUrl, reportBytes, "")
 	if err != nil {
-		g.Logger.Errorf("hostname %s acces pigeonurl error %s", hostname, err)
+		g.Logger.Errorf("SendPigeonAlarm() hostname %s acces pigeonurl error %s", hostname, err)
 		return err
 	}
 
 	respBody, err := ioutil.ReadAll(resp)
 	if err != nil {
-		g.Logger.Errorf("hostname %s http io read error %s", hostname, err)
+		g.Logger.Errorf("SendPigeonAlarm() hostname %s http io read error %s", hostname, err)
 		return err
 	}
 
@@ -125,13 +104,13 @@ func SendPigeonAlarm(p Alarm) (err error){
 	var pigeonResp PigeonResopose
 	err = json.Unmarshal(respBody, &pigeonResp)
 	if err != nil {
-		g.Logger.Errorf("hostname %s http response json unmarshal error %s",
+		g.Logger.Errorf("SendPigeonAlarm() hostname %s http response json unmarshal error %s",
 			hostname, err)
 		return err
 	}
 
 	if pigeonResp.Success != true {
-		g.Logger.Errorf("[告警发送失败] hostname %s pigon response false, msg: %s",
+		g.Logger.Errorf("[告警发送失败] - SendPigeonAlarm() hostname %s pigon response false, msg: %s",
 			hostname, pigeonResp.Message)
 	} else {
 		LogPigeonAlarm(pigeonAlarms, pigeonResp.Object)

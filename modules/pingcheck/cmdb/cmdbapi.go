@@ -1,11 +1,10 @@
 package cmdb
 
 import (
-
+	"encoding/json"
 	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"github.com/signmem/falcon-plus/modules/pingcheck/tools"
-	"encoding/json"
-	"io/ioutil"
+	"io"
 )
 
 
@@ -36,7 +35,7 @@ func CmdbApiQuery(api string, query string ) (mqAppStruct  CmdbTotalObject, err 
 		return mqAppStruct, err
 	}
 
-	responseBody, err := ioutil.ReadAll(response)
+	responseBody, err := io.ReadAll(response)
 	defer response.Close()
 
 	if err != nil {

@@ -2,15 +2,28 @@ package tools
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"encoding/json"
+	"strings"
 	"time"
 	"errors"
 	"context"
+)
+
+type CMDBResp struct {
+	Code    int    `json:"code"`
+	Msg 	string  `json:"message"`
+	SUCCESS bool 	`json:"success"`
+}
+
+const (
+	DefaultHttpTimeout = 180 * time.Second
+	TestHttpTimeout    = 300 * time.Second
 )
 
 
@@ -31,7 +44,9 @@ func FalconToken() (string) {
 
 func HttpApiPut(fullApiUrl string, jsonData []byte, tokenType string) (status bool, err error) {
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: DefaultHttpTimeout,
+	}
 
 	req, err := http.NewRequest(http.MethodPut, fullApiUrl, bytes.NewBuffer(jsonData))
 
@@ -50,13 +65,16 @@ func HttpApiPut(fullApiUrl string, jsonData []byte, tokenType string) (status bo
 	resp, err := client.Do(req)
 
 	if err != nil {
-		g.Logger.Errorf("HttpApiPut() Do() error:%s", err)
+		g.Logger.Errorf("HttpApiPut() Do() error: %s", err)
 		return false, err
 	}
+
+	defer resp.Body.Close()
 
 	if  ( resp.StatusCode  == 200 ) {
 		return true, nil
 	} else {
+		resp.Body.Close()
 		return false, errors.New("[ERROR] HttpApiPut() response not 200")
 	}
 
@@ -64,14 +82,27 @@ func HttpApiPut(fullApiUrl string, jsonData []byte, tokenType string) (status bo
 
 func HttpApiGet(fullApiUrl string, params string, tokenType string) (io.ReadCloser, error) {
 
-	client := &http.Client{}
+	cmdbUrl :=  g.Config().Cmdb.Url
+	var timeout time.Duration
+
+	if strings.Contains(cmdbUrl, "test") {
+		timeout = TestHttpTimeout
+	} else {
+		timeout = DefaultHttpTimeout
+	}
+
+	client := &http.Client{
+		Timeout: timeout,
+	}
+
 	httpUrl := fullApiUrl + params
 
 	req, err := http.NewRequest("GET", httpUrl, nil)
 
 	if err != nil {
-		g.Logger.Errorf("HttpApiGet()  NewRequest() error:%s", err)
-		return nil, errors.New("HttpApiGet() http get error with NewRequest")
+		msg := fmt.Sprintf("HttpApiGet()  NewRequest() error: %s", err)
+		g.Logger.Errorf(msg)
+		return nil, errors.New(msg)
 	}
 
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
@@ -83,15 +114,27 @@ func HttpApiGet(fullApiUrl string, params string, tokenType string) (io.ReadClos
 	resp, err := client.Do(req)
 
 	if err != nil {
-		g.Logger.Errorf("HttpApiGet() Do %s error:%s ", fullApiUrl, err)
-		return nil, errors.New("HttpApiGet() http get error")
+		msg := fmt.Sprintf("HttpApiGet() Do %s error: %s ", fullApiUrl, err)
+		g.Logger.Errorf(msg)
+		return nil, errors.New(msg)
 	}
 
-	if ( resp.StatusCode  == 200 ) {
+	if  resp.StatusCode == 200  {
 		return resp.Body, nil
 	} else {
+		if g.Config().Debug == true {
+
+			b, err := httputil.DumpResponse(resp, true)
+			if err != nil {
+				g.Logger.Errorf("HttpApiGet() dump error with %s", err)
+			}
+
+			g.Logger.Errorf("HttpApiGet() code not 200 %s", string(b))
+		}
+
+		resp.Body.Close()
 		g.Logger.Errorf("HttpApiGet() resp status error, code:%d ", resp.StatusCode)
-		return nil, errors.New("HttpApiGet() resp status code not 200.")
+		return nil, errors.New("HttpApiGet() resp: code not 200")
 	}
 
 }
@@ -108,7 +151,10 @@ func HttpApiPost(fullApiUrl string, params []byte, tokenType string) (io.ReadClo
 		DisableCompression: true,
 	}
 
-	client := &http.Client{Transport: tr}
+	client := &http.Client{
+		Transport: tr,
+		Timeout:   DefaultHttpTimeout,
+	}
 
 	req, err := http.NewRequest("POST", fullApiUrl, bytes.NewBuffer(params))
 
@@ -117,9 +163,9 @@ func HttpApiPost(fullApiUrl string, params []byte, tokenType string) (io.ReadClo
 		return nil, errors.New("HttpApiPost() http post error with NewRequest")
 	}
 
-	ctx, cancelFunc := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultHttpTimeout)
+	defer cancel()
 	request := req.WithContext(ctx)
-
 
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	if tokenType == "falcon" {
@@ -130,13 +176,11 @@ func HttpApiPost(fullApiUrl string, params []byte, tokenType string) (io.ReadClo
 	resp, err := client.Do(request)
 
 	if err != nil {
-		return nil, errors.New("HttpApiPost()  client access error.")
+		resp.Body.Close()
+		g.Logger.Errorf("HttpApiPost() client access error: %s", err)
+		return nil, errors.New("HttpApiPost() client access error.")
 	}
-	defer cancelFunc()
-	if resp.Body == nil {
-		defer resp.Body.Close()
-		return nil, err
-	}
+
 
 	if ( resp.StatusCode  == 200 ) {
 		return resp.Body, nil
@@ -150,6 +194,7 @@ func HttpApiPost(fullApiUrl string, params []byte, tokenType string) (io.ReadClo
 
 			g.Logger.Errorf("HttpApiPost() ", string(b))
 		}
+		resp.Body.Close()
 		return nil, errors.New("HttpApiPost() resp status code not 200.")
 	}
 }
@@ -158,7 +203,9 @@ func HttpApiDelete(fullApiUrl string, params string, tokenType string) (io.ReadC
 	// use to do http Delete request
 	// METHOD: DELETE
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: DefaultHttpTimeout,
+	}
 	httpUrl := fullApiUrl + params
 	req, err := http.NewRequest("DELETE", httpUrl, nil)
 
@@ -183,6 +230,7 @@ func HttpApiDelete(fullApiUrl string, params string, tokenType string) (io.ReadC
 	if ( resp.StatusCode  == 200 ) {
 		return resp.Body, nil
 	} else {
+		resp.Body.Close()
 		g.Logger.Errorf("HttpApiDelete() resp.StatusCode code is:%d", resp.StatusCode)
 		return nil, errors.New("HttpApiDelete() resp status code not 200.")
 	}

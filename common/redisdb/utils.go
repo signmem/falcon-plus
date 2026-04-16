@@ -3,7 +3,6 @@ package redisdb
 import (
     "fmt"
     "github.com/gomodule/redigo/redis"
-
 )
 
 func Ping() error {
@@ -18,6 +17,26 @@ func Ping() error {
     return nil
 }
 
+
+func Keys(path string) (keys []string, err error) {
+
+    conn := Pool.Get()
+    defer conn.Close()
+
+    keys, err = redis.Strings(conn.Do("KEYS", path))
+
+    return
+}
+
+func Mgets(keys []interface{}) (strValues []string, err error){
+
+    conn := Pool.Get()
+    defer conn.Close()
+
+    strValues, err = redis.Strings(conn.Do("MGET", keys...))
+
+    return
+}
 
 func Get(key string) ([]byte, error) {
 	// 获取某个 key 的值

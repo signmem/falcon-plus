@@ -1,17 +1,28 @@
 {
     "debug":true,
-    "forcecheck": false,  // forcecheck = true 用于强制校验，不需要等到每日下午 15:30 
-    "alarmenable": true,  // alarmenable = true 允许告警， false 不执行告警
-    "logmaxage": 432000,
-    "logrotateage": 86400,
-    "logfile": "/apps/svr/falcon-plus/pingcheck/logs/app.log",
-    "agentexpire" : 300,        // check agent ttl expire time limit
-    // "flushkeyinterval": 300,    // reflush redis hostname (暂时没用到)
-    "checkinterval": 60,        // interval to connect redis 每 60 秒检测 REDIS 一次
-    "agentpriority":"3",        // send alarm priority, 默认 3 = 一般严重
-    "excludedomain": [],        // 过滤的 domain
-    "excludedbatags": "DBA",      // 所有 DBA tag
-    "excludedbadeploytype": [80,81,85,83,82], // 对应了  mysql redis mongodb oracle memcache
+    "agent_check": true,   // check falcon-agent  false == 不发送报警  true == 发送报警
+    "alarm_enable": true,  // alarmenable = true 允许告警， false 不执行告警
+    "log_max_age": 432000,
+    "log_rotate_age": 86400,
+    "agent_expire" : 180,        // falcon-agent 
+    "ping_dead_expire": 60,     // ping check
+    "falcon_reping_concurrent": 300,
+    "falcon_ping_concurrent": 100,
+    "agent_priority":"3",        // send alarm priority, 默认 3 = 一般严重
+    "check_ping_interval": 60,
+    "check_interval": 60,        // interval to connect redis 每 60 秒检测 REDIS 一次 ( falcon-agent)
+    "log_file": "/apps/svr/falcon-plus/pingcheck/logs/app.log",
+    "alarm_file": "/apps/svr/falcon-plus/pingcheck/logs/alarm.log",
+    // "excludedbatags": "DBA",      // 所有 DBA tag
+    // "excludedbadeploytype": [80,81,85,83,82], // 对应了  mysql redis mongodb oracle memcache
+    "exclude_bus_group": [
+        "基础架构/数据库/mysql",
+        "基础架构/数据库/redis",
+        "基础架构/数据库/oracle",
+        "基础架构/数据库/MC",
+        "基础架构/数据库/MongoDB"
+    ],
+    "exclude_app_name": [],        // 过滤的 domain
     "http": {
         "enabled": true,
         "listen": "0.0.0.0:8080"
@@ -19,18 +30,26 @@
     "redis": {
         "enabled": true,    // 是否读 redis , 不读 redis 则不对 redis 主机过期进行检测
         "server":"",
-        "port": "6379",
-        "maxidle": 20,
-        "maxactive":50,
-        "idletimeout": 60
+        "port": "6804",
+        "max_idle": 20,
+        "max_active":50,
+        "idle_timeout": 60,
+        "lock_key": "/falcon-pingcheck",
+        "lock_time": 5,
+        "ask_locktime": 3
     },
     "falcon": {
          "falconauth": "",
          "falconsign": "",
          "url": "http://falcon-api.vip.vip.com"
     },
+    "falcon_agent": {
+         "address": "127.0.0.1",
+         "port": "22230",
+         "step": 60
+    },
     "cmdb": {
-        "url": "http://cmdb3.api.vip.com",
+        "url": "http://test.cmdb3.api.vip.com",
         "sysname": "falcon-server",
         "token": ""
     },
@@ -42,6 +61,12 @@
     },
     "transfer" : {
         "interval": 10,
+        "enabled": true,
+        "timeout": 1000,
+        "addrs": [
+            "gd13-falcon-transfer-001.idc.vip.com:8433",
+            "gd13-falcon-transfer-002.idc.vip.com:8433"
+        ],
         "servers": [
             "10.189.20.26:6060",
             "10.189.20.26:6060",
@@ -56,9 +81,9 @@
     },
     "proxy": {
         "servers": [
-            "",
-            "",
-            ""
+            "gd15-falcon-pingproxy.vip.vip.com",
+            "gd16-falcon-pingproxy.vip.vip.com",
+            "js2-falcon-pingproxy.vip.vip.com"
         ]
     }
 }

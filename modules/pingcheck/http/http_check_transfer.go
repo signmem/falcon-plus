@@ -2,9 +2,8 @@ package http
 
 import (
 	"fmt"
-	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	httpclient "github.com/signmem/falcon-plus/common/http"
-	"io/ioutil"
+	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"strings"
 	"time"
 )
@@ -22,8 +21,7 @@ func CheckTransfer() {
 				fmt.Println(err)
 				continue
 			}
-			body, _ := ioutil.ReadAll(resp)
-			resp.Close()
+			body := resp
 
 			if strings.Contains(string(body), "ok") {
 				httpCount += 1

@@ -12,24 +12,23 @@ func GenFalconView(alarminfo Alarm) string {
 	metric := alarminfo.Metric
 	hostname := alarminfo.Hostname
 	newchar := strings.Replace(metric, ".", "_", -1)
-
-	return fmt.Sprintf("https://m3.vip.vip.com/v3/dashboard/panel/view/255/0?refresh=1m&orgId=1&from=now-3h&to=now&var-host_name=%s&var-metric=%s", hostname,metric)
+	return fmt.Sprintf("https://m3.vip.vip.com/v3/dashboard/panel/view/255/0?refresh=1m&orgId=1&from=now-3h&to=now&var-host_name=%s&var-metric=%s", hostname, newchar)
 }
 
 func GenAlarmSubject (alarminfo Alarm) string {
 	return fmt.Sprintf("[%s] %s (%s) %s", alarminfo.Domain, alarminfo.Hostname,
-		alarminfo.Ip, alarminfo.Event )
+		alarminfo.Ip, alarminfo.Subject )
 }
 
 func GenAlarmMesage (alarminfo Alarm) string {
 	return fmt.Sprintf("[%s] %s (%s) %s, 当前值：%s", alarminfo.Domain,
-		alarminfo.Hostname,	alarminfo.Ip, alarminfo.Detail , alarminfo.Value)
+		alarminfo.Hostname,	alarminfo.Ip, alarminfo.Message , alarminfo.Value)
 }
 
 func GenSmsSubject(alarminfo Alarm) string {
 	// sms  informastion == message information !
 	return fmt.Sprintf("[%s] %s (%s) %s, 当前值：%s", alarminfo.Domain, alarminfo.Hostname,
-		alarminfo.Ip, alarminfo.Event, alarminfo.Value)
+		alarminfo.Ip, alarminfo.Subject, alarminfo.Value)
 }
 
 func buildPigeonExtagrLegend(alarminfo Alarm) string {
@@ -37,7 +36,7 @@ func buildPigeonExtagrLegend(alarminfo Alarm) string {
 }
 
 func buildPigeonExtagrTitil(alarminfo Alarm) string {
-	titleInfo := fmt.Sprintf("%s",alarminfo.Event)
+	titleInfo := fmt.Sprintf("%s",alarminfo.Subject)
 	return strings.Replace(titleInfo,"%","",-1)
 }
 

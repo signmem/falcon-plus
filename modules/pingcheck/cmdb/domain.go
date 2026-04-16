@@ -32,19 +32,17 @@ func getExcludeDomains() (allDomains []string, allowDomains []string, extDomains
 
 		for _, info := range cmdbData.Object {
 
-			// fmt.Printf("domain %s, depart %s", info.Name, info.DeptFullname)
-
 			domain := info.Name
 			var allow bool
 			allow = true
 
 			allDomains = append(allDomains, domain)
 
-			if len(g.Config().ExcludeDomains) > 0 {
-				for _, excString := range g.Config().ExcludeDomains {
+			if len(g.Config().ExcludeAppName) > 0 {
+				for _, excString := range g.Config().ExcludeAppName {
 					if excString == domain {
 						if g.Config().Debug {
-							g.Logger.Debugf("domain Match ExcludeDomains: %s", domain)
+							g.Logger.Debugf("[EXT DOMAINS] %s Match Exclude App Name", domain)
 						}
 						extDomains = append(extDomains, domain)
 						allow = false
@@ -53,7 +51,11 @@ func getExcludeDomains() (allDomains []string, allowDomains []string, extDomains
 				}
 			}
 
-			for _, groupName := range g.Config().ExcludeDomains {
+			if allow == false {
+				continue
+			}
+
+			for _, groupName := range g.Config().ExcludeBusGroup {
 				if info.BusGroupName == groupName && allow == true {
 					extDomains = append(extDomains, domain)
 					allow = false
@@ -68,11 +70,11 @@ func getExcludeDomains() (allDomains []string, allowDomains []string, extDomains
 	}
 
 	if g.Config().Debug {
-		g.Logger.Debug("===== 额外域名 domain type 检测匹配: start  ================")
-		g.Logger.Debugf("domain exclude 总共:  %d", len(extDomains))
-		g.Logger.Debugf("domain allow 总共:  %d", len(allowDomains))
-		g.Logger.Debugf("domain total 总共:  %d", len(allDomains))
-		g.Logger.Debug("===== 额外域名 domain type 检测匹配: end  ================")
+		g.Logger.Debug("=====[CMDB APP INDEX START] ================")
+		g.Logger.Debugf("[CMDB APP INDEX] 过滤应用 总共:  %d", len(extDomains))
+		g.Logger.Debugf("[CMDB APP INDEX] 合法应用 总共:  %d", len(allowDomains))
+		g.Logger.Debugf("[CMDB APP INDEX] 获取应用 总共:  %d", len(allDomains))
+		g.Logger.Debug("=====[CMDB APP INDEX END] ================")
 	}
 
 	return

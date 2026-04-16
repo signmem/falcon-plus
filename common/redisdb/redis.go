@@ -18,6 +18,7 @@ var (
 	ErrNil = errors.New("no matching record found in redis database")
 	Ctx    = context.TODO()
 	Pool *redis.Pool
+	Client *redis9.Client
 	MaxIdle int
 	MaxActive int
     IdleTimeOut int
@@ -55,12 +56,13 @@ func CleanupHook() {
 }
 
 func RedisClient(maxidle int, maxactive int, server string) (client *redis9.Client, err error) {
+
 	client = redis9.NewClient(&redis9.Options{
 		Addr: 				server,
 		Password: 			"",
 		DB: 				0,
 		MaxIdleConns: 		maxidle,
-		MaxActiveConns: 	maxactive,
+		PoolSize:           maxactive,
 	})
 
 	ctx := context.Background()

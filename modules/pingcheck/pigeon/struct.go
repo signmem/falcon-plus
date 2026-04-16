@@ -15,7 +15,7 @@ type GenReport struct {
 
 
 type Alarms struct {
-	Fid       string    `json:"fid"`
+	Fid       int    `json:"fid"`
 	AlarmCode string    `json:"alarm_code"`    // none
 	Value     string    `json:"value"`
 	Subject   string    `json:"subject"`
@@ -62,17 +62,18 @@ type M3Body struct {
 
 
 type Alarm struct {
-	Domain  	string  		`json:"domain"`
-	Hostname 	string 			`json:"hostname"`
-	Event 		string 			`json:"event"`
-	Detail      string 			`json:"detail"`
-	Ip			string 			`json:"ip"`
+	Fid 		int 			`json:"fid"`
+	AlarmCode 	string 			`json:"alarm_code"`
 	Value 		string 			`json:"value"`
-	Metric 		string 			`json:"metric"`
-	Priority 	string 			`json:"priority"`
-	Status 		int 			`json:"status"`
+	Subject 	string			`json:"subject"`
 	Message     string 			`json:"message"`
+	Priority 	string 			`json:"priority"`
+	Ip			string 			`json:"host"`
+	Hostname 	string 			`json:"hostname"`
+	Domain  	string  		`json:"domain"`
 	Transfer 	string			`json:"transfer"`
+	AlarmTime 	string 			`json:"alarm_time"`
+	Metric 		string 			`json:"metric"`
 }
 
 

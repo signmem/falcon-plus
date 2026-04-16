@@ -25,6 +25,9 @@ type CmdbTotalObject struct {
 		OSType 			  string 		`json:"os_type"`
 		RoomName		  string 		`json:"room_name"` // room
 		Tag 			  string 		`json:"tag"`
+		MonType			  int			`json:"monitor_type"`  // monitor
+		SysAdmin 		  string		`json:"sys_admin"`
+		SysAdminName 	  string 		`json:"sys_admin_nick_name"`
 	} `json:"object"`
 	PreObject []struct {
 		Name              string		`json:"name"`        // app name
@@ -40,5 +43,8 @@ type CmdbTotalObject struct {
 		OSType 			  string 		`json:"os_type"`
 		RoomName		  string 		`json:"room_name"` // room
 		Tag 			  string 		`json:"tag"`
+		MonType				int			`json:"monitor_type"`  // monitor
+		SysAdmin 		  string		`json:"sys_admin"`
+		SysAdminName 	  string 		`json:"sys_admin_nick_name"`
 	} `json:"pre_object"`
 }

@@ -9,108 +9,113 @@ import (
 )
 
 
-
-func GetRedisHostList() ( hosts []string, err error) {
-	service := "agent.alive"
-	hosts, err = redisdb.RedisServiceScan(service)
-	if err != nil {
-		g.Logger.Errorf("GetRedisHostList() err:%s", err)
-		return
-	}
-
-	if g.Config().Debug {
-		g.Logger.Debugf("GetRedisHostList() hosts length is:%d", len(hosts))
-	}
-
-	return
-}
-
 func GetRedisHostsExpire() {
+
+	g.FalconAgentLru.Init()
 
 	for {
 
-			var tempCache g.LruCache
+		if time.Now().Unix() % int64(g.Config().CheckInterval) == 0 {
+
+			g.Logger.Debugf("[Redis Check Agent Alive] start")
+			g.LruMaintain()     // init lru and remove out of lru
 
 			service := "agent.alive"
 			timeOut := int64(g.Config().AgentExpire)
-			normalHost, expireHost, alarm, err := redisdb.RedisServiceExprieScan(service, timeOut)
+			normalHost, expireHost, redisAlarm, err := redisdb.RedisServiceExprieScan(service, timeOut)
 
-			if err != nil && alarm == true {
+
+			// redisAlarm 意味着 redisdb.RedisServiceExprieScan 函数产生故障，需要告警 redis 访问出错信息
+			if redisAlarm  {
 				SendRedisAlarm(fmt.Sprintf("%s", err))
-				time.Sleep(time.Second * time.Duration(g.Config().CheckInterval))
+				g.Logger.Errorf("[Redis Check Agent Alive] service scan failed: %v", err)
+				// time.Sleep(time.Second * time.Duration(g.Config().CheckInterval))
+				continue
+			}
+
+			if err != nil {
+				g.Logger.Debugf("[Redis Check Agent Alive Debug] %s", err)
+				// time.Sleep(time.Second * time.Duration(g.Config().CheckInterval))
 				continue
 			}
 
 			g.RedisNormalHost = normalHost
 
 			if g.Config().Debug {
-				g.Logger.Debugf("GetRedisHostList() Redis 中正常上报 falcon alive 主机 Total: %d", len(normalHost))
-				g.Logger.Debugf("GetRedisHostList() Redis 中过期 falcon alive 主机 Total: %d", len(expireHost))
+				g.Logger.Debugf("[AGENT CHECK] Redis 中正常上报 falcon alive 主机 Total: %d", len(normalHost))
+				g.Logger.Debugf("[AGENT CHECK] Redis 中过期 falcon alive 主机 Total: %d", len(expireHost))
 			}
 
-			/*  对过期主机执行删除操作，并删除 redis 记录  terry.zeng
-			*/
+			g.FalconAgentAliveReportSuccess.Set(len(normalHost))
+			g.FalconAgentAliveReportTimeOut.Set(len(expireHost))
 
-			tempCache.HostList = expireHost
-			tempCache.Timestamp = time.Now().Unix()
-
-			g.TotalLru = g.PutData(g.TotalLru, tempCache)
+			// 清理 redis 中过期的主机信息
+			// 意图: 120 秒不上报 falcon agent 人为 agent 故障
+			// 发送 pigeon 告警信息  SendAlarm()
 
 			if len(expireHost) > 0 {
 
-				task_chan := make(chan bool, 10)
-				wg := sync.WaitGroup{}
-				defer close(task_chan)
+				taskChan := make(chan struct{}, 10)
+				var wg sync.WaitGroup
 
 				for _, host := range expireHost {
 
+					hostCopy := host
+
+					taskChan <- struct{}{}
 					wg.Add(1)
-					task_chan <- true
 
-					go func(host string) {
+					go func(h string) {
 
-						<-task_chan
+						defer func() {
+							<-taskChan
+							wg.Done()
+						}()
 
 						if g.Config().Debug {
-							g.Logger.Debugf("GetRedisHostsExpire() 删除 redis 记录 host:%s", host)
+							g.Logger.Debugf("[AGENT CHECK] - [REDIS DELETE] 删除 redis 记录 host:%s", host)
 						}
 
-						err := redisdb.RedisServerDelete(service, host)
+						err := redisdb.RedisServerDelete(service, h)
 
 						if err != nil {
-							g.Logger.Debugf("GetRedisHostsExpire() 删除 redis 主机记录错误  host:%s error:%s", host, err)
+							g.Logger.Debugf("[AGENT CHECK] 删除 redis 主机记录错误  host:%s error:%s", host, err)
 						}
 
-						if g.SkipAlarm == false {
-							SendAlarm(host,"")
+						if g.Config().AlarmEnable == true && g.SkipAgentAlarm == false {
+							SendAlarm(h,"", false, "redis")
 						}
 
-						defer wg.Done()
-					}(host)
+					}(hostCopy)
 				}
+				wg.Wait()
+				close(taskChan)
 			}
+
+			// terry.zeng 计算时间窗口内告警次数
+			alarmTotalCount := g.FalconAgentLru.GetLength(0)
+
+			g.FalconAgentAliveAlarmCounter.Set(alarmTotalCount)
 
 			if g.Config().Debug == true {
-				g.Logger.Debugf("[告警信息] 在 %d 个时间窗口内已经发生过 %d 次告警",
-					(g.Config().Degrade.Period+1), g.GetHostCount(g.TotalLru))
+				g.Logger.Debugf("[告警信息 Total] 在 %d 个时间窗口内已经发生过 %d 次告警",
+					g.Config().Degrade.Period, alarmTotalCount )
 			}
 
-			if g.SkipAlarm == true {
-				var hostDetail []string
-				for _, info := range g.TotalLru {
-					hostDetail = append(hostDetail, info.HostList...)
-				}
+			// terry.zeng
+			if g.SkipAgentAlarm == true {
+				g.FalconAgentAliveAlarmDegarded.Set(1)
 
-				if len(hostDetail) > 0 {
-					SendInternalAlarm(hostDetail)
+				if alarmTotalCount  > 0 {
+					SendInternalAlarm()
 				}
-
-				// 如果希望在降级期间保留所有的主机 list 则关闭下面 g.TotalLru 方法
-				// 当前希望降级期间每分钟都清空主机列表一次 (每分钟都有独立的主机记录日志)
-				g.TotalLru = make(map[int]g.LruCache, g.Config().Degrade.Period)
+			} else {
+				g.FalconAgentAliveAlarmDegarded.Set(0)
 			}
+			g.Logger.Debugf("[Redis Check Agent Alive end.]")
+		}
 
-			time.Sleep(time.Second * time.Duration(g.Config().CheckInterval))
+		time.Sleep( time.Second * 1 )
 	}
 }
 
