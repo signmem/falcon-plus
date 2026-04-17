@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/toolkits/file"
+	"github.com/signmem/file"
 )
 
 type File struct {

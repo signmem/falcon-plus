@@ -6,7 +6,7 @@ import (
 	cmodel "github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/graph/g"
 	"github.com/signmem/falcon-plus/modules/graph/store"
-	"github.com/toolkits/file"
+	"github.com/signmem/file"
 )
 
 // 初始化索引功能模块

@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"github.com/gin-contrib/pprof"
 	log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
@@ -98,6 +99,9 @@ func Start() {
 	if addr == "" {
 		return
 	}
+
+	pprof.Register(router)
+
 	go router.Run(addr)
 
 	select {

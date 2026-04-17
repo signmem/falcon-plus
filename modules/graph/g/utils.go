@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/toolkits/file"
+	"github.com/signmem/file"
 )
 
 // RRDTOOL UTILS
