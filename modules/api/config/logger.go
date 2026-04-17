@@ -2,7 +2,7 @@ package config
 
 import (
         "fmt"
-        "github.com/coreos/go-log/log"
+        "github.com/signmem/go-log/log"
         "github.com/lestrrat/go-file-rotatelogs"
         "time"
 )

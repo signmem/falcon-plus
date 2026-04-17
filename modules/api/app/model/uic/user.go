@@ -2,7 +2,7 @@ package uic
 
 import (
 	con "github.com/signmem/falcon-plus/modules/api/config"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 )
 
 type User struct {

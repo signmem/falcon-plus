@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/signmem/falcon-plus/modules/api/app/model/uic"
 	"github.com/signmem/falcon-plus/modules/api/config"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 )
 
 type WebSession struct {

@@ -6,7 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/signmem/falcon-plus/modules/api/app/utils"
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 )
 
 func TestHash(t *testing.T) {

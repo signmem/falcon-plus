@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/DeanThompson/ginpprof"
+	"github.com/gin-contrib/pprof"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +30,7 @@ func StartGin(port string, r *gin.Engine) {
 
 	// automatically add routers for net/http/pprof
 	// e.g. /debug/pprof, /debug/pprof/heap, etc.
-	ginpprof.Wrap(r)
+	pprof.Register(r)
 
 	graph.Routes(r)
 	uic.Routes(r)

@@ -138,10 +138,10 @@ func EndpointCounterDistinct(c *gin.Context) {
 	currentTime := time.Now()
 	var checkDate string
 	if plan == "" || plan == "full" {
-		oldTime := currentTime.AddDate(0, 0, -5)
+		oldTime := currentTime.AddDate(0, 0, -2)
 		checkDate = oldTime.Format("2006-01-02")   // get data from 2days to now
 	} else if plan == "append" {
-		m, _ := time.ParseDuration("-120m")
+		m, _ := time.ParseDuration("-65m")
 		oldtime := currentTime.Add(m)
 		checkDate = oldtime.Format("2006-01-02 15:04:05")
 	}

@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/signmem/falcon-plus/modules/api/config"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 	"github.com/toolkits/str"
 )
 

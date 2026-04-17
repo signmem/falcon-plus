@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	h "github.com/signmem/falcon-plus/modules/api/app/helper"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 )
 
 func AuthSessionMidd(c *gin.Context) {

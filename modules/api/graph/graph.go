@@ -12,7 +12,7 @@ import (
 	backend "github.com/signmem/falcon-plus/common/backend_pool"
 	cmodel "github.com/signmem/falcon-plus/common/model"
 	cutils "github.com/signmem/falcon-plus/common/utils"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 	connp "github.com/toolkits/conn_pool"
 	rpcpool "github.com/toolkits/conn_pool/rpc_conn_pool"
 	"github.com/signmem/consistent/rings"

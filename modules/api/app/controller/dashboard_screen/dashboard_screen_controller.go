@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	h "github.com/signmem/falcon-plus/modules/api/app/helper"
 	m "github.com/signmem/falcon-plus/modules/api/app/model/dashboard"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 )
 
 func ScreenCreate(c *gin.Context) {

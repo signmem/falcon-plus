@@ -2,11 +2,10 @@ package data
 
 import (
 	"bufio"
-	"io/ioutil"
-	"github.com/signmem/falcon-plus/modules/api/config"
+	"encoding/json"
 	"github.com/signmem/falcon-plus/common/http"
 	cutils "github.com/signmem/falcon-plus/common/utils"
-	"encoding/json"
+	"github.com/signmem/falcon-plus/modules/api/config"
 	"os"
 	"time"
 )
@@ -17,7 +16,16 @@ var (
 )
 
 func CronGenMetric() {
+
+	MetricSliceNow, err := loadMetric(MetricFile)
+
+	if err != nil {
+		config.Logger.Errorf("load file %s error:%s", MetricFile, err)
+	}
+
 	time.Sleep(time.Second * time.Duration(10))
+
+
 	var plan string
 	for {
 		config.Logger.Debug("CronGenMetric() get metrice start.")
@@ -69,6 +77,30 @@ func AppendMetric(metrics []string) (err error) {
 }
 
 
+func loadMetric(filePath  string) (metricsCount []string, err error) {
+
+	var metrics []string
+	file, err := os.Open(filePath)
+
+	if err != nil {
+		return metrics, err
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		metrics = append(metrics, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		return metrics, err
+	}
+
+	return metrics, nil
+}
+
 func CountMetricFileLine() int {
 	fileName := MetricFile
 	file,err := os.Open(fileName)
@@ -100,11 +132,10 @@ func getMetricData(plan string) ([]string) {
 		return data
 	}
 
-	responseBody, err := ioutil.ReadAll(resp)
+	responseBody := resp
 	if err != nil {
 		config.Logger.Errorf("getMetricData() error with %s", err)
 	}
-	defer resp.Close()
 
 	_ = json.Unmarshal(responseBody, &data)
 	return data

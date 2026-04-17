@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/spf13/viper"
+	_ "github.com/signmem/viper"
 	"github.com/open-falcon/falcon-plus/modules/api/app/model/uic"
 	_ "github.com/open-falcon/falcon-plus/modules/api/config"
 )

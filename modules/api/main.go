@@ -16,7 +16,7 @@ import (
 	"github.com/signmem/falcon-plus/modules/api/config"
 	"github.com/signmem/falcon-plus/modules/api/graph"
 	"github.com/signmem/falcon-plus/modules/api/data"
-	"github.com/spf13/viper"
+	"github.com/signmem/viper"
 )
 
 func initGraph() {

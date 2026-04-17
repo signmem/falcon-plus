@@ -11,7 +11,7 @@ import (
 //
 
 const (
-	VERSION = "20220419"
+	VERSION = "20241224"
 )
 
 func init() {
