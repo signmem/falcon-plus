@@ -9,6 +9,7 @@ import (
 	"github.com/signmem/falcon-plus/modules/hbs/db"
 	"sync"
 	"time"
+	"context"
 )
 
 type SafeAgents struct {
@@ -66,6 +67,20 @@ func DeleteStaleAgents() {
 	for {
 		time.Sleep(duration)
 		deleteStaleAgents()
+	}
+}
+
+func DeleteStaleAgentsWithContext(ctx context.Context) {
+	ticker := time.NewTicker(time.Hour * time.Duration(12))
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			deleteStaleAgents()
+		case <-ctx.Done():
+			return
+		}
 	}
 }
 

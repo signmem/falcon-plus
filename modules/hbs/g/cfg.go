@@ -2,7 +2,7 @@ package g
 
 import (
 	"encoding/json"
-	"github.com/toolkits/file"
+	"github.com/signmem/file"
 	"log"
 	"sync"
 )
@@ -17,6 +17,7 @@ type GlobalConfig struct {
 	Hosts     string      `json:"hosts"`
 	Database  string      `json:"database"`
 	MaxIdle   int         `json:"maxIdle"`
+	IdleTime  int 		  `json:"idleTime"`
 	Listen    string      `json:"listen"`
 	Trustable []string    `json:"trustable"`
 	Http      *HttpConfig `json:"http"`

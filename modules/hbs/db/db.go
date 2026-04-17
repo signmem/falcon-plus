@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/signmem/falcon-plus/modules/hbs/g"
 	"log"
+	"time"
 )
 
 var DB *sql.DB
@@ -17,6 +18,7 @@ func Init() {
 	}
 
 	DB.SetMaxIdleConns(g.Config().MaxIdle)
+	DB.SetConnMaxIdleTime(time.Duration(g.Config().IdleTime) * time.Second)
 
 	err = DB.Ping()
 	if err != nil {

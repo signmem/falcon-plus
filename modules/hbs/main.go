@@ -10,7 +10,10 @@ import (
 	"github.com/signmem/falcon-plus/modules/hbs/rpc"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	_ "net/http/pprof"
+	"context"
 )
 
 func main() {
@@ -28,7 +31,19 @@ func main() {
 	db.Init()
 	cache.Init()
 
-	go cache.DeleteStaleAgents()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		cache.DeleteStaleAgentsWithContext(ctx)
+	}()
+
+
+	// go cache.DeleteStaleAgents()
 
 	go http.Start()
 	go rpc.Start()
