@@ -3,7 +3,8 @@ package consumer
 import (
 	"errors"
 
-	"github.com/IBM/sarama"
+	"github.com/signmem/sarama"
+	"github.com/signmem/sarama-cluster"
 	nsema "github.com/toolkits/concurrent/semaphore"
 
 	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
@@ -63,7 +64,11 @@ func highRun() {
 			defer sema.Release()
 			sender.Push2TrendSendQueue(string(msg.Value))
 			proc.ConsumeCnt.Incr()
-			g.Logger.Debugf("Get message: %s\n", string(msg.Value))
+
+			if g.Config().Debug {
+				g.Logger.Debugf("Get message: %s\n", string(msg.Value))
+			}
+
 			highGroup.MarkOffset(msg, "")
 		}(message)
 	}

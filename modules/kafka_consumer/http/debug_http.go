@@ -1,12 +1,6 @@
 package http
 
-import (
-	"fmt"
-	"github.com/signmem/falcon-plus/modules/kafka_consumer/sender"
-	"net/http"
-	"strings"
-)
-
+/*
 func configDebugHttpRoutes() {
 	// conn pools
 	http.HandleFunc("/debug/connpool/", func(w http.ResponseWriter, r *http.Request) {
@@ -30,3 +24,5 @@ func configDebugHttpRoutes() {
 		w.Write([]byte(result))
 	})
 }
+
+*/

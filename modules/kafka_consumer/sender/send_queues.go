@@ -7,6 +7,10 @@ import (
 
 func initSendQueues() {
 	cfg := g.Config()
+
+	/*
+	terry.zeng
+
 	for node := range cfg.Trend.Cluster {
 		Q := nlist.NewSafeListLimited(DefaultSendQueueMaxSize)
 		TrendQueues[node] = Q
@@ -16,6 +20,8 @@ func initSendQueues() {
 			// terrytsang
 		}
 	}
+	*/
+
 	if cfg.Transfer.Enabled {
 		TransferQueue = nlist.NewSafeListLimited(DefaultSendQueueMaxSize)
 	}

@@ -1,7 +1,6 @@
 package sender
 
 import (
-	"strings"
 	"time"
 
 	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
@@ -30,13 +29,15 @@ func startProcCron() {
 func startLogCron() {
 	for {
 		time.Sleep(DefaultLogCronPeriod)
-		logConnPoolsProc()
+		// logConnPoolsProc()
 	}
 }
 
 func refreshSendingCacheSize() {
 	cfg := g.Config()
-	proc.TrendQueuesCnt.SetCnt(calcSendCacheSize(TrendQueues))
+
+	// proc.TrendQueuesCnt.SetCnt(calcSendCacheSize(TrendQueues))
+
 	if cfg.Transfer.Enabled {
 		proc.TransferQueuesCnt.SetCnt(int64(TransferQueue.Len()))
 	}
@@ -52,6 +53,8 @@ func calcSendCacheSize(mapList map[string]*list.SafeListLimited) int64 {
 	return cnt
 }
 
+/*
 func logConnPoolsProc() {
 	g.Logger.Printf("connPools proc: \n%v", strings.Join(TrendConnPools.Proc(), "\n"))
 }
+*/

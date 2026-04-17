@@ -28,7 +28,7 @@ func startHttpServer() {
 
 	configCommonRoutes()
 	configProcHttpRoutes()
-	configDebugHttpRoutes()
+	// configDebugHttpRoutes() terry.zeng
 
 	s := &http.Server{
 		Addr:           addr,

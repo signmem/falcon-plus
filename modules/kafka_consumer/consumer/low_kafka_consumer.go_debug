@@ -4,13 +4,15 @@ package consumer
 import (
 	"errors"
 	"time"
+
 	"github.com/signmem/sarama"
 	nsema "github.com/toolkits/concurrent/semaphore"
 	"github.com/signmem/kafka/consumergroup"
 	"github.com/wvanbergen/kazoo-go"
-	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
-	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
-	"github.com/signmem/falcon-plus/modules/kafka_consumer/sender"
+
+	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/g"
+	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/proc"
+	"github.com/open-falcon/falcon-plus/modules/kafka_consumer/sender"
 )
 
 var (
@@ -49,6 +51,7 @@ func lowInitGroup() error {
 	zookeeperNodes, groupCfg.Zookeeper.Chroot = kazoo.ParseConnectionString(cfg.Consumer.Zookeeper)
 	var err error
 	lowGroup, err = consumergroup.JoinConsumerGroup(cfg.Consumer.Group, cfg.Consumer.Topics, zookeeperNodes, groupCfg)
+
 	if err != nil {
 		lowGroup = nil
 		return err
@@ -66,19 +69,55 @@ func lowRun() {
 	if concurrent < 1 {
 		concurrent = 1
 	}
+
+	eventCount := 0
+
 	sema := nsema.NewSemaphore(concurrent)
 	for message := range lowGroup.Messages() {
+		if g.Config().Debug {
+			g.Logger.Debugf("[DEBUG] %d 1 msg topic is: %s, key is %s, value is %s",
+				eventCount, message.Topic, string(message.Key), string(message.Value))
+		}
 		sema.Acquire()
 		go func(msg *sarama.ConsumerMessage) {
 			defer sema.Release()
+			if g.Config().Debug {
+				g.Logger.Debugf("%d 2 msg topic is: %s, key is %s, value is %s",
+					eventCount, msg.Topic, string(msg.Key), string(msg.Value))
+			}
 			sender.Push2TrendSendQueue(string(msg.Value))
 			proc.ConsumeCnt.Incr()
 
 			if g.Config().Debug {
+
+				offsets := make(map[string]map[int32]int64)
+				if offsets[message.Topic] == nil {
+					offsets[message.Topic] = make(map[int32]int64)
+				}
+
+				if offsets[message.Topic][message.Partition] != 0 && offsets[message.Topic][message.Partition] != message.Offset-1 {
+					g.Logger.Debugf("Unexpected offset on %s:%d. Expected %d, found %d, diff %d.\n", message.Topic, message.Partition, offsets[message.Topic][message.Partition]+1, message.Offset, message.Offset-offsets[message.Topic][message.Partition]+1)
+				}
+
+				offsets[message.Topic][message.Partition] = message.Offset
+
+				g.Logger.Debugf("[DEBUG] %d , %+v 3", eventCount, offsets)
 				g.Logger.Debugf("Get message: %s\n", string(msg.Value))
+				g.Logger.Debugf("[DEBUG] %d 4 msg topic is: %s, key is %s, value is %s",
+					eventCount, msg.Topic, string(msg.Key), string(msg.Value))
 			}
 
-			lowGroup.CommitUpto(msg)
+			err := lowGroup.CommitUpto(msg)
+
+			if err != nil {
+				g.Logger.Debugf("[ERROR] CommitUpto: %s", err)
+			}
+
+
+			if g.Config().Debug {
+				g.Logger.Debugf("[DEBUG] %d 5 finished.", eventCount)
+			}
+			eventCount += 1
 		}(message)
 	}
 }

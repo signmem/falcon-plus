@@ -21,18 +21,23 @@ const (
 func startSendTasks() {
 	cfg := g.Config()
 	// init semaphore
-	trendConcurrent := cfg.Trend.MaxConns
-	transferConcurrent := cfg.Transfer.MaxConns * len(cfg.Transfer.Cluster)
 
-	if trendConcurrent < 1 {
-		trendConcurrent = 1
-	}
+	transferConcurrent := cfg.Transfer.MaxConns * len(cfg.Transfer.Cluster)
 
 	if transferConcurrent < 1 {
 		transferConcurrent = 1
 	}
 
 	// init send go-routines
+	/*
+
+	terry.zeng
+
+	trendConcurrent := cfg.Trend.MaxConns
+	if trendConcurrent < 1 {
+		trendConcurrent = 1
+	}
+
 	for node := range cfg.Trend.Cluster {
 		// terrytsang
 		if g.Config().DebugTraffer {
@@ -41,11 +46,16 @@ func startSendTasks() {
 		queue := TrendQueues[node]
 		go forward2TrendTask(queue, node, trendConcurrent)
 	}
+	*/
 
 	if cfg.Transfer.Enabled {
 		go forward2TransferTask(TransferQueue, transferConcurrent)
 	}
 }
+
+
+/*
+terry.zeng
 
 // Trend定时任务, 将Trend发送缓存中的数据 通过rpc连接池 发送到Trend
 func forward2TrendTask(Q *list.SafeListLimited, node string, concurrent int) {
@@ -99,6 +109,8 @@ func forward2TrendTask(Q *list.SafeListLimited, node string, concurrent int) {
 	}
 }
 
+*/
+
 // Transfer定时任务, 将MetricItem发送缓存中的数据 通过rpc连接池 发送到Transfer
 func forward2TransferTask(Q *list.SafeListLimited, concurrent int) {
 	cfg := g.Config()
@@ -121,8 +133,20 @@ func forward2TransferTask(Q *list.SafeListLimited, concurrent int) {
 		}
 
 		transItems := make([]*model.MetricValue, count)
+
 		for i := 0; i < count; i++ {
-			transItems[i] = items[i].(*model.MetricValue)
+			var transItem  *model.MetricValue
+			transItem = new(model.MetricValue)
+
+			transItem.Value  = items[i].(*model.TrendItem).Value
+			transItem.Step  = int64(items[i].(*model.TrendItem).Step)
+			transItem.Tags  = items[i].(*model.TrendItem).Tags
+			transItem.Timestamp  = items[i].(*model.TrendItem).Timestamp
+			transItem.Metric  = items[i].(*model.TrendItem).Metric
+			transItem.Value  = items[i].(*model.TrendItem).Endpoint
+			transItem.Value  = items[i].(*model.TrendItem).DsType
+
+			transItems[i] = transItem
 		}
 
 		sema.Acquire()

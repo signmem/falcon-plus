@@ -9,6 +9,8 @@ import (
 func initConnPools() {
 	cfg := g.Config()
 
+	/*
+	terry.zeng
 	if cfg.Trend.Enabled {
 		trendInstances := nset.NewStringSet()
 		for _, instance := range cfg.Trend.Cluster {
@@ -23,6 +25,7 @@ func initConnPools() {
 
 		// trendInstances.Delete(instance)  terrytsang
 	}
+	*/
 
 	// transfer
 	if cfg.Transfer.Enabled {
@@ -43,6 +46,6 @@ func initConnPools() {
 }
 
 func DestroyConnPools() {
-	TrendConnPools.Destroy()
+	// TrendConnPools.Destroy()  terry.zeng
 	TransferConnPools.Destroy()
 }

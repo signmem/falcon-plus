@@ -3,7 +3,7 @@ package g
 import (
 	"fmt"
 	"github.com/lestrrat/go-file-rotatelogs"
-	"github.com/coreos/go-log/log"
+	"github.com/signmem/go-log/log"
 	"time"
 )
 

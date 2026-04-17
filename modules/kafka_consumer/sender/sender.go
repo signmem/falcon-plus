@@ -1,13 +1,13 @@
 package sender
 
 import (
+	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
 	"strconv"
 	"strings"
 
 	backend "github.com/signmem/falcon-plus/common/backend_pool"
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
-	"github.com/signmem/falcon-plus/modules/kafka_consumer/proc"
 	"github.com/signmem/consistent/rings"
 	nlist "github.com/toolkits/container/list"
 )
@@ -25,14 +25,14 @@ var (
 // 发送缓存队列
 // node -> queue_of_data
 var (
-	TrendQueues   = make(map[string]*nlist.SafeListLimited)
+	// TrendQueues   = make(map[string]*nlist.SafeListLimited)
 	TransferQueue *nlist.SafeListLimited
 )
 
 // 连接池
 // node_address -> connection_pool
 var (
-	TrendConnPools    *backend.SafeRpcConnPools
+	// TrendConnPools    *backend.SafeRpcConnPools
 	TransferConnPools *backend.SafeRpcConnPools
 	TransferMap       = make(map[string]string, 0)
 	TransferHostnames = make([]string, 0)
@@ -42,7 +42,9 @@ var (
 func Start() {
 	initConnPools()
 	initSendQueues()
-	initNodeRings()
+
+	//  initNodeRings() terry.zeng
+
 	// SendTasks依赖基础组件的初始化,要最后启动
 	startSendTasks()
 	startSenderCron()
@@ -86,6 +88,10 @@ func convert2TrendItem(kafkaStr string) *model.TrendItem {
 	}
 }
 
+/*
+
+terry.zeng
+
 func trendConvert2MetricItem(trend *model.TrendItem) *model.MetricValue {
 	if trend.Metric == "cpu.idle" {
 		return &model.MetricValue{
@@ -101,11 +107,14 @@ func trendConvert2MetricItem(trend *model.TrendItem) *model.MetricValue {
 	return nil
 }
 
+
+
 func push(item *model.TrendItem) {
 	if item == nil {
 		return
 	}
 	pk := item.PK()
+
 	node, err := TrendNodeRing.GetNode(pk)
 	if err != nil {
 		g.Logger.Errorf("Get node error: %s", err)
@@ -120,13 +129,15 @@ func push(item *model.TrendItem) {
 		proc.SendToTrendDropCnt.Incr()
 	}
 }
+*/
 
 // 将原始数据入到transfer发送缓存队列
 func Push2TransferSendQueue(item *model.TrendItem) {
 	if item == nil {
 		return
 	}
-	metricItem := trendConvert2MetricItem(item)
+	// metricItem := trendConvert2MetricItem(item) terry.zeng
+	metricItem := item
 	if metricItem != nil {
 		isSuccess := TransferQueue.PushFront(metricItem)
 		if !isSuccess {
@@ -147,37 +158,68 @@ func Push2TrendSendQueue(val string) {
 	ignoreHostMap := g.Config().IgnoreHost
 
 	if b, ok := ignoreHostMap[item.Endpoint]; ok && b {
-		g.Logger.Debugf("hostname is invalid, ignore, host: %s, %s/%s, %.3f", item.Endpoint, item.Metric, item.Tags, item.Value)
+
+		if g.Config().Debug {
+			g.Logger.Debugf("hostname is invalid, ignore, host: %s, %s/%s, %.3f", item.Endpoint, item.Metric, item.Tags, item.Value)
+		}
+
 		proc.ConsumeDropCnt.Incr()
 	} else if item.Metric == "net.port.listen" {
-		g.Logger.Debug("net.port.listen ignored")
+
+		if g.Config().Debug {
+			g.Logger.Debug("net.port.listen ignored")
+		}
+
 		proc.ConsumeDropCnt.Incr()
 	} else if strings.HasSuffix(item.Metric, "alive") {
-		g.Logger.Debugf("%s:%s/%s metric has alive suffix metric, ignored", item.Endpoint, item.Metric, item.Tags)
+
+		if g.Config().Debug {
+			g.Logger.Debugf("%s:%s/%s metric has alive suffix metric, ignored", item.Endpoint, item.Metric, item.Tags)
+		}
+
 		proc.ConsumeDropCnt.Incr()
 	} else if strings.HasPrefix(item.Metric, "hardware") {
-		g.Logger.Debugf("%s:%s/%s step has hardware prefix metric, ignored", item.Endpoint, item.Metric, item.Tags)
+
+		if g.Config().Debug {
+			g.Logger.Debugf("%s:%s/%s step has hardware prefix metric, ignored", item.Endpoint, item.Metric, item.Tags)
+		}
+
 		proc.ConsumeDropCnt.Incr()
 	} else if strings.HasPrefix(item.Metric, "docker") {
-		g.Logger.Debugf("%s:%s/%s step has docker prefix metric, ignored", item.Endpoint, item.Metric, item.Tags)
+
+		if g.Config().Debug {
+			g.Logger.Debugf("%s:%s/%s step has docker prefix metric, ignored", item.Endpoint, item.Metric, item.Tags)
+		}
+
 		proc.ConsumeDropCnt.Incr()
 	} else if item.Step > 1800 {
-		g.Logger.Debugf("%s:%s/%s step is larger than 1800s, ignored, step:%d", item.Endpoint, item.Metric, item.Tags, item.Step)
+
+		if g.Config().Debug {
+			g.Logger.Debugf("%s:%s/%s step is larger than 1800s, ignored, step:%d", item.Endpoint, item.Metric, item.Tags, item.Step)
+		}
+
 		proc.ConsumeDropCnt.Incr()
 	} else if b, ok := percentCheckMap[item.Metric]; ok && b {
 		if item.Value > 100 || item.Value < 0 {
-			g.Logger.Infof("%s:%s/%s percent value is invalid, ignore, value: %.3f", item.Endpoint, item.Metric, item.Tags, item.Value)
+
+			if g.Config().Debug {
+				g.Logger.Infof("%s:%s/%s percent value is invalid, ignore, value: %.3f", item.Endpoint, item.Metric, item.Tags, item.Value)
+			}
+
 			proc.ConsumeDropCnt.Incr()
 		} else {
+			// terry.zeng
 			//log.Debug("start push %s:%s/%s percent value value: %.3f", item.Endpoint, item.Metric, item.Tags, item.Value)
-			push(item)
+			// push(item)
+
 			if g.Config().Transfer.Enabled {
 				if item.Metric == "cpu.idle" {
 					Push2TransferSendQueue(item)
 				}
 			}
 		}
-	} else {
+	} /* else {
 		push(item)
 	}
+	*/
 }

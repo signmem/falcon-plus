@@ -2,7 +2,7 @@ package consumer
 
 import (
 	"time"
-	"github.com/IBM/sarama"
+	"github.com/signmem/sarama"
 	"github.com/signmem/falcon-plus/modules/kafka_consumer/g"
 )
 
@@ -21,14 +21,17 @@ func initGroup(isHigh bool) error {
 
 func Start() {
 	var isHigh bool
+	var msg string
 	if g.Config().Consumer.KafkaVersion == "high" {
 		isHigh = true
+		msg = "isHigh"
 	} else {
 		isHigh = false
+		msg = "isLow"
 	}
 	err := initGroup(isHigh)
 	if err != nil {
-		g.Logger.Errorf("init consumer group error: %s", err.Error())
+		g.Logger.Errorf("Start() init %s consumer group error: %s", msg, err.Error())
 		return
 	}
 	run(isHigh)
