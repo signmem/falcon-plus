@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/signmem/falcon-plus/modules/pingproxy/g"
 	"net/http"
+	_ "net/http/pprof"
 	"log"
 )
 

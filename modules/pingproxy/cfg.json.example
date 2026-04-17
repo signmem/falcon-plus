@@ -1,11 +1,11 @@
 {
 	"debug": true,
-	"logfile": "",
+	"logfile": "/apps/logs/log_receiver/falcon-pingproxy.log",
 	"logmaxage": 432000,
 	"logrotateage": 86400,
 	"http": {
 		"enabled": true,
-		"listen":"",
-                "port": ""
+		"listen": "0.0.0.0",
+                "port": "8080"
 	}
 }

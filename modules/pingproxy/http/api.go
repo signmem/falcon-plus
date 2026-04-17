@@ -33,7 +33,7 @@ func hostPingCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g.Logger.Infof("pingcheck: ip:%s, sttus %b", PingResponse.Ipaddr, PingResponse.PingStatus)
+	g.Logger.Infof("ip:%s, status: %v", PingResponse.Ipaddr, PingResponse.PingStatus)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(bs)
 
