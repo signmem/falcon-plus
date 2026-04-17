@@ -1,0 +1,46 @@
+{
+        "debug" : true,
+        "logrotateage": 86400,
+        "logmaxage": 2592000,
+        "disablesend": false,
+        "enablecnt": true,
+	"cluster": "gd15",
+        "logfile": "/apps/svr/falcon-plus/status-collectd/logs/app.log",
+	"http": {
+		"listen": "0.0.0.0",
+		"port": "8838"
+        },
+	"redis": {
+		"enabled":true,
+		"server": "gd15-db-redis-noah-falcon-alarm-1-m001.vip.vip.com",
+		"port": "9743",
+		"max_idle": 20,
+		"max_active": 50,
+		"idle_timeout": 60,
+		"lock_key": "/falcon-collector",
+		"lock_time": 5,
+		"ask_locktime": 3
+	},
+        "cmdb": {
+                "url": "http://cmdb3.api.vip.com",
+                "sysname": "falcon-server",
+                "token": "97546c11aec467eeb9bdc26b1333f515"
+        },
+        "kafka": {
+                "enable": true,
+                "topic": "vipfalcon",
+                "servers": [
+ 			"gd15-vipfalcon-kafka-001.idc.vip.com:9092",
+			"gd15-vipfalcon-kafka-002.idc.vip.com:9092",
+			"gd15-vipfalcon-kafka-003.idc.vip.com:9092",
+			"gd15-vipfalcon-kafka-004.idc.vip.com:9092",
+			"gd15-vipfalcon-kafka-005.idc.vip.com:9092",
+			"gd15-vipfalcon-kafka-006.idc.vip.com:9092"
+		]
+        },
+        "env": {
+            "name": "prd",
+            "type": "yaml",
+            "path": "/apps/conf/falcon-plus/status-collectd/config"
+        }
+}

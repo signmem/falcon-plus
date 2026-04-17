@@ -1,4 +1,4 @@
-CMD = agent aggregator graph hbs judge nodata transfer gateway api alarm kafka_consumer trend pingcheck collector pingproxy
+CMD = agent aggregator graph hbs judge nodata transfer gateway api alarm kafka_consumer trend pingcheck collector pingproxy status-collectd
 TARGET = open-falcon
 PACKAGES ?= $(shell go list ./... | grep -v /vendor/)
 GOFILES := $(shell find . -name "*.go" -type f -not -path "./vendor/*")
