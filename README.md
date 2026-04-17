@@ -27,12 +27,25 @@ github.com/toolkits/nux/portstat.go
 
 # 编译 graph 注意   
 
+* 常规编译一定报错
+
+## go1.14 编译建议
 >  graph 必须使用 centos6 系统执行编译否则无法在生产中正常运行
 >  编译时候需要带 CGO_ENABLED=1  
 >  否则会遇到交叉编译错误问题  ( 建议使用 go1.14 编译)  
 
+## go1.18 centos7 下编译方法
+
+* 需要使用 centos7.9 extras sclo yum repo 
+* 执行 yum install -y centos-release-scl devtoolset-9-gcc devtoolset-9-gcc-c 
+* 切换 gcc 版本 scl enable devtoolset-9 bash
+* gcc 版本切换为  gcc (GCC) 9.3.1 20200408 (Red Hat 9.3.1-2)
+* 利用命令编译就可以通过 CGO_ENABLED=1  go build -o bin/graph/falcon-graph ./modules/graph
+
 ```
-CGO_ENABLED=1 go build -o bin/graph/falcon-graph ./modules/graph
+yum install -y centos-release-scl devtoolset-9-gcc devtoolset-9-gcc-c
+scl enable devtoolset-9 bash
+CGO_ENABLED=1  go build -o bin/graph/falcon-graph ./modules/graph
 ```
 
 # 编译 kafka_consumer 注意  
