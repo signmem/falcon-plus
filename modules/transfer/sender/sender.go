@@ -10,7 +10,7 @@ import (
 	nlist "github.com/toolkits/container/list"
 	"log"
 	//added by vincent.zhang for sending to kafka
-	//"github.com/IBM/sarama"
+	//"github.com/signmem/sarama"
 	cutils "github.com/signmem/falcon-plus/common/utils"
 )
 

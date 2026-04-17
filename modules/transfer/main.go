@@ -37,6 +37,13 @@ func init () {
 	redisdb.Pool = redisdb.NewPool(redisdb.MaxIdle, redisdb.MaxActive,
 		redisdb.IdleTimeOut, redisdb.Server)
 	redisdb.CleanupHook()
+
+	var err error
+	redisdb.Client, err = redisdb.RedisClient(redisdb.MaxIdle,redisdb.MaxActive,redisdb.Server)
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 

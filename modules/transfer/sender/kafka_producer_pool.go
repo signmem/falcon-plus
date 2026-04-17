@@ -10,7 +10,7 @@ import (
 	"github.com/signmem/falcon-plus/modules/transfer/g"
 	"github.com/signmem/falcon-plus/modules/transfer/proc"
 
-	"github.com/IBM/sarama"
+	"github.com/signmem/sarama"
 )
 
 var (

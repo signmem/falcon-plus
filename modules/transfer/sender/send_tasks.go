@@ -3,7 +3,7 @@ package sender
 import (
 	"bytes"
 
-	"github.com/IBM/sarama" // added by vincent.zhang for sending to kafka
+	"github.com/signmem/sarama" // added by vincent.zhang for sending to kafka
 	cmodel "github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/transfer/g"
 	"github.com/signmem/falcon-plus/modules/transfer/proc"
