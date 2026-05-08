@@ -21,9 +21,9 @@ func CheckTransfer() {
 				fmt.Println(err)
 				continue
 			}
-			body := resp
+			body := string(resp)
 
-			if strings.Contains(string(body), "ok") {
+			if strings.Contains(body, "ok") {
 				httpCount += 1
 			}
 		}

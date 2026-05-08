@@ -191,6 +191,8 @@ type APIEventCasesGetInputs struct {
 	Status        string `json:"status" form:"status"`
 	ProcessStatus string `json:"process_status" form:"process_status"`
 	Metric        string `json:"metric" form:"metric"`
+	WildCardMatch string `json:"wildcard" from:"wildcard"`
+
 
 	BussName string `json:"buss_name" form:"buss_name"`
 	GrpName  string `json:"grp_name" form:"grp_name"`
@@ -454,6 +456,127 @@ func GetEventCasesV2(c *gin.Context) {
 
 	h.JSONR(c, cevens)
 }
+
+
+// GetEventCasesWildCard use to get alarms.event_cases  wildcase info # terry.zeng
+func GetEventCasesWildCard(c *gin.Context) {
+	var inputs APIEventCasesGetInputs
+	inputs.GrpName = c.DefaultQuery("grp_name", "")
+	inputs.Status = c.DefaultQuery("status", "")
+	inputs.ProcessStatus = c.DefaultQuery("process_status", "unresolved")
+	inputs.Metric = c.DefaultQuery("metric", "all")
+	inputs.Priority = c.DefaultQuery("priority", "-1")
+	inputs.StartTime = c.DefaultQuery("startTime", strconv.FormatInt(time.Now().Unix()-3600, 10))
+	inputs.EndTime = c.DefaultQuery("endTime", strconv.FormatInt(time.Now().Unix(), 10))
+	inputs.WildCardMatch = c.DefaultQuery("wildcard", "")
+
+	//for get correct table name
+	//f := alm.EventCases{}
+	cevens := []EventCasesWFid{}
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, badstatus, err)
+		return
+	}
+
+	validProcessStatus := []string{"ignored", "unresolved", "resolved", `in progress`, "comment"}
+	if !stringInSlice(inputs.ProcessStatus, validProcessStatus) {
+		h.JSONR(c, badstatus, fmt.Sprintf(`The valid value of ProcessStatus is one of %v`, validProcessStatus))
+		return
+	}
+
+	filterGroup := func(d *gorm.DB) *gorm.DB {
+		if inputs.GrpName != "" {
+			s_group := strings.SplitN(inputs.GrpName, ",", -1)
+			return d.Where("grp_name in (?)", s_group)
+		} else {
+			return d
+		}
+	}
+
+	filterWildCard := func(d *gorm.DB) *gorm.DB {
+		wc := inputs.WildCardMatch
+
+		if wc != "" {
+			wcCard := "%" + wc + "%"
+			return d.Where("grp_name like ? or endpoint like ?", wcCard, wcCard)
+		} else {
+			return d
+		}
+	}
+
+	filterStatus := func(d *gorm.DB) *gorm.DB {
+		if inputs.Status != "" {
+			return d.Where("status = ?", inputs.Status)
+		} else {
+			return d
+		}
+	}
+
+	filterMetric := func(d *gorm.DB) *gorm.DB {
+		if inputs.Metric == "hardware" {
+			return d.Where("metric like 'hardware.%'")
+		} else if inputs.Metric == "non-hardware" {
+			return d.Where("metric not like 'hardware.%'")
+		} else {
+			return d
+		}
+	}
+
+	filterProcessStatus := func(d *gorm.DB) *gorm.DB {
+		if inputs.ProcessStatus != "" {
+			return d.Where("process_status = ?", inputs.ProcessStatus)
+		} else {
+			return d
+		}
+	}
+
+	filterPriority := func(d *gorm.DB) *gorm.DB {
+		if inputs.Priority != "-1" {
+			s_priority := strings.SplitN(inputs.Priority, ",", -1)
+			return d.Where("priority in (?)", s_priority)
+		} else {
+			return d
+		}
+	}
+
+	filterTime := func(d *gorm.DB) *gorm.DB {
+		cond := fmt.Sprintf(`update_at >= FROM_UNIXTIME(%v) AND
+		 update_at <= FROM_UNIXTIME(%v)`, inputs.StartTime, inputs.EndTime)
+		return d.Where(cond)
+	}
+	db.Alarm.Table("event_cases").Scopes(filterGroup, filterStatus, filterWildCard,
+		filterMetric, filterProcessStatus, filterPriority, filterTime).Find(&cevens)
+
+	//var strategy falcon_portal.Strategy
+	//var expression falcon_portal.Expression
+	tmp_fid := struct {
+		FId int64 `json:"fid" gorm:"column:fid"`
+	}{}
+
+	for i, event := range cevens {
+		if event.StrategyId > 0 && event.ExpressionId == 0 {
+			dt := db.Falcon.Table("strategy").Select("fid").Where("id = ?", event.StrategyId).Find(&tmp_fid)
+			if dt.Error != nil {
+				//h.JSONR(c, expecstatus, "error occurred while fetching strategy.fid")
+				//return
+				continue
+			}
+		} else if event.StrategyId == 0 && event.ExpressionId > 0 {
+			dt := db.Falcon.Table("expression").Select("fid").Where("id = ?", event.ExpressionId).Find(&tmp_fid)
+			if dt.Error != nil {
+				//h.JSONR(c, expecstatus, "error occurred while fetching expression.fid")
+				//return
+				continue
+			}
+		}
+		cevens[i].FId = tmp_fid.FId
+	}
+
+	h.JSONR(c, cevens)
+}
+
+
 
 type APITotalOfEventCasesGetInputs struct {
 	StartTime     string `json:"startTime" form:"startTime"`

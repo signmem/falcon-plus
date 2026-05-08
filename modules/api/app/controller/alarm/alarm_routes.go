@@ -23,6 +23,7 @@ func Routes(r *gin.Engine) {
 	alarmapi.GET("/events", EventsGet)
 	alarmapi.GET("/GetEventCases", GetEventCases)
 	alarmapi.GET("/GetEventCasesV2", GetEventCasesV2)
+	alarmapi.GET("/GetEventCasesWildCard", GetEventCasesWildCard)
 	alarmapi.GET("/GetTotalOfEventCases", GetTotalOfEventCases)
 	alarmapi.POST("/event_note", AddNotesToAlarm)
 	alarmapi.GET("/event_note", GetNotesOfAlarm)

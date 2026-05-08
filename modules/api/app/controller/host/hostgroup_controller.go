@@ -602,17 +602,48 @@ func UnBindTemplateToGroup(c *gin.Context) {
 		GrpID: inputs.GrpID,
 		TplID: inputs.TplID,
 	}
+
 	db.Falcon.Where("grp_id = ? and tpl_id = ?", inputs.GrpID, inputs.TplID).Find(&grpTpl)
 	switch {
 	case !user.IsAdmin() && grpTpl.BindUser != user.Name:
 		h.JSONR(c, badstatus, errors.New("You don't have permission can do this."))
 		return
 	}
+
 	if dt := db.Falcon.Where("grp_id = ? and tpl_id = ?", inputs.GrpID, inputs.TplID).Delete(&grpTpl); dt.Error != nil {
 		h.JSONR(c, badstatus, dt.Error)
 		return
 	}
-	h.JSONR(c, fmt.Sprintf("template: %v is unbind of HostGroup: %v", inputs.TplID, inputs.GrpID))
+
+	pluginDIR := f.Plugin{
+		GrpId: inputs.GrpID,
+	}
+
+	db.Falcon.Where("grp_id = ?", inputs.GrpID).Find(&pluginDIR)
+	switch{
+	case pluginDIR.Dir == "":
+		h.JSONR(c, fmt.Sprintf("template: %v is unbind of HostGroup: %v", inputs.TplID, inputs.GrpID))
+		return
+	}
+
+	tplPlugin := f.TplPlugin{
+		Plugin: pluginDIR.Dir,
+	}
+
+	db.Falcon.Where("tpl_id = ?", pluginDIR.Dir ).Find(&tplPlugin)
+	switch {
+	case tplPlugin.Plugin == "":
+		h.JSONR(c, fmt.Sprintf("template: %v is unbind of HostGroup: %v", inputs.TplID, inputs.GrpID))
+		return
+	}
+
+	if dt := db.Falcon.Where("tpl_id = ? and plugin = ?", inputs.TplID, pluginDIR.Dir).Delete(&tplPlugin); dt.Error != nil {
+		h.JSONR(c, badstatus, dt.Error)
+		return
+	}
+	h.JSONR(c, fmt.Sprintf("template: %v , plugin %v unbind HostGroup: %v",
+		inputs.TplID,  pluginDIR.Dir, inputs.GrpID ))
+
 	return
 }
 
@@ -646,6 +677,7 @@ func UnBindTemplateToGroupV2(c *gin.Context) {
 		TplID: template.ID,
 	}
 	db.Falcon.Where("grp_id = ? and tpl_id = ?", hostgroup.ID, template.ID).Find(&grpTpl)
+
 	switch {
 	case grpTpl.BindUser == "":
 		h.JSONR(c, badstatus, fmt.Sprintf("HostGroup %v does not bind to Template %v", inputs.GrpName, inputs.TplName))
@@ -654,11 +686,42 @@ func UnBindTemplateToGroupV2(c *gin.Context) {
 		h.JSONR(c, badstatus, errors.New("You don't have permission can do this."))
 		return
 	}
+
 	if dt := db.Falcon.Where("grp_id = ? and tpl_id = ?", hostgroup.ID, template.ID).Delete(&grpTpl); dt.Error != nil {
 		h.JSONR(c, badstatus, dt.Error)
 		return
 	}
-	h.JSONR(c, fmt.Sprintf("template: %v is unbind of HostGroup: %v", inputs.TplName, inputs.GrpName))
+
+	pluginDIR := f.Plugin{
+		GrpId: hostgroup.ID,
+	}
+
+	db.Falcon.Where("grp_id = ?", hostgroup.ID).Find(&pluginDIR)
+
+	switch{
+	case pluginDIR.Dir == "":
+		h.JSONR(c, fmt.Sprintf("template: %v is unbind of HostGroup: %v", inputs.TplName, inputs.GrpName))
+		return
+	}
+
+	tplPlugin := f.TplPlugin{
+		Plugin: pluginDIR.Dir,
+	}
+
+	db.Falcon.Where("tpl_id = ?", pluginDIR.Dir ).Find(&tplPlugin)
+	switch {
+	case tplPlugin.Plugin == "":
+		h.JSONR(c, fmt.Sprintf("template: %v is unbind of HostGroup: %v", inputs.TplName, inputs.GrpName))
+		return
+	}
+
+	if dt := db.Falcon.Where("tpl_id = ? and plugin = ?", template.ID, pluginDIR.Dir).Delete(&tplPlugin); dt.Error != nil {
+		h.JSONR(c, badstatus, dt.Error)
+		return
+	}
+	h.JSONR(c, fmt.Sprintf("template: %v , plugin %v unbind HostGroup: %v",
+		inputs.TplName,  pluginDIR.Dir, inputs.GrpName ))
+
 	return
 }
 
