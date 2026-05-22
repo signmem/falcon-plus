@@ -13,6 +13,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"context"
+)
+
+var (
+    illegalCharRegexp *regexp.Regexp
 )
 
 type Transfer int
@@ -41,157 +46,143 @@ func (t *Transfer) Update(args []*cmodel.MetricValue, reply *cmodel.TransferResp
 	return RecvMetricValues(args, reply, "rpc")
 }
 
+
+func InitIllegalCharRegexp() {
+    IllegalChar := g.Config().IllegalChar
+    IllegalCharString := strings.Join(IllegalChar, "|")
+    illegalCharRegexp = regexp.MustCompile(IllegalCharString)
+}
+
+
+
 // process new metric values
 func RecvMetricValues(args []*cmodel.MetricValue, reply *cmodel.TransferResponse, from string) error {
 	start := time.Now()
 	reply.Invalid = 0
 
 	//IllegalMetric := g.Config().IllegalMetric
-	IllegalChar := g.Config().IllegalChar
-	IllegalCharString := strings.Join(IllegalChar,"|")
-	var re = regexp.MustCompile(IllegalCharString)
 
-	items := []*cmodel.MetaData{}
-	log_items := []*sender.LogMetricItem{}
+	items := make([]*cmodel.MetaData, 0, len(args))
+	log_items := make([]*sender.LogMetricItem,0, len(args))
+
 	for _, v := range args {
+
 		if v == nil {
 			reply.Invalid += 1
 			continue
 		}
 
+		newV := *v
+
 		// 历史遗留问题.
 		// 老版本agent上报的metric=kernel.hostname的数据,其取值为string类型,现在已经不支持了;所以,这里硬编码过滤掉
-		if v.Metric == "kernel.hostname" {
+		if newV.Metric == "kernel.hostname" {
 			reply.Invalid += 1
 			continue
 		}
 
-		if v.Metric == "" || v.Endpoint == "" {
+		if newV.Metric == "" || newV.Endpoint == "" {
 			reply.Invalid += 1
 			continue
 		}
 
-		v.Metric = re.ReplaceAllString(v.Metric, "")
+		newV.Metric = illegalCharRegexp.ReplaceAllString(newV.Metric, "")
+		// v.Metric = re.ReplaceAllString(v.Metric, "")
 
-		if v.Type != g.COUNTER && v.Type != g.GAUGE && v.Type != g.DERIVE && v.Type != g.LOG {
+		if newV.Type != g.COUNTER && newV.Type != g.GAUGE && newV.Type != g.DERIVE && newV.Type != g.LOG {
 			reply.Invalid += 1
 			continue
 		}
 
-		if v.Value == "" {
+		if newV.Value == nil {
 			reply.Invalid += 1
 			continue
 		}
 
-		if len(v.Tags) > 0 {
+		if len(newV.Tags) > 0 {
+
 			var validTags []string
+			tags := strings.Split(newV.Tags, ",")
 
-			tags := strings.Split(v.Tags, ",")
-
+			skipMetric := false
 			for _, tag := range tags {
 				if cutils.IsChinese(tag) {
 					reply.Invalid += 1
-					continue
+					skipMetric = true
+					break
 				}
 
 				splitTag := strings.Split(tag, "=")
-				if len(splitTag) != 2 {
+				if len(splitTag) != 2 || len(splitTag[1]) == 0 {
 					continue
 				}
 
-				if  len(splitTag[1]) == 0 {
-					continue
-				}
-
-				validTags = append(validTags, re.ReplaceAllString(tag,""))
+				validTags = append(validTags, illegalCharRegexp.ReplaceAllString(tag,""))
 			}
+
+			if skipMetric {
+				continue
+			}
+
 			if len(validTags) > 0 {
-				v.Tags = strings.Join(validTags,",")
+				newV.Tags = strings.Join(validTags,",")
 			} else {
-				v.Tags = ""
+				newV.Tags = ""
 			}
 
 		}
 
-		if v.Step <= 0 {
+		if newV.Step <= 0 {
 			reply.Invalid += 1
 			continue
 		}
 
-		if len(v.Metric)+len(v.Tags) > 510 {
+		if len(newV.Metric)+len(newV.Tags) > 510 {
 			reply.Invalid += 1
 			continue
 		}
 
 		// TODO 呵呵,这里需要再优雅一点
 		now := start.Unix()
-		if v.Timestamp <= 0 || v.Timestamp > now*2 {
-			v.Timestamp = now
+		maxtime := now + 172800
+		mintime := now - 172800
+		if newV.Timestamp <= mintime || newV.Timestamp > maxtime {
+			newV.Timestamp = now
 		}
 
 
 		// 要处理 agent.alive 需要在这里增加处理方法  
 		// url api || redis || etcd 都可以  
 
-		if v.Metric == "agent.alive" {
-			service := v.Metric
-			hostname := v.Endpoint
-			_, err := redisdb.RedisServiceWrite(service, hostname)
-			if err != nil {
-				proc.SendToRedisFailCnt.Incr()
-				log.Printf("redisdb.RedisServiceWrite() error: %s", err)
-			} else {
-				proc.SendToRedisCnt.Incr()
-			}
+		if newV.Metric == "agent.alive" {
+			service := newV.Metric
+			hostname := newV.Endpoint
+
+			go func(service, hostname string) {
+				timeoutCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+				defer cancel()
+
+				_, err := redisdb.RedisServiceWriteTimeout(timeoutCtx, service, hostname)
+				if err != nil {
+					proc.SendToRedisFailCnt.Incr()
+					log.Printf("redis write error: %v", err)
+				} else {
+					proc.SendToRedisCnt.Incr()
+				}
+			}(service, hostname)
 		}
 		// edit by terry.zeng
 
-
-		/*
-			fv := &cmodel.MetaData{
-				Metric:      v.Metric,
-				Endpoint:    v.Endpoint,
-				Timestamp:   v.Timestamp,
-				Step:        v.Step,
-				CounterType: v.Type,
-				Tags:        cutils.DictedTagstring(v.Tags), //TODO tags键值对的个数,要做一下限制
-			}
-
-			valid := true
-			var vv float64
-			var err error
-			switch cv := v.Value.(type) {
-			case string:
-				vv, err = strconv.ParseFloat(cv, 64)
-				if err != nil {
-					valid = false
-				}
-			case float64:
-				vv = cv
-			case int64:
-				vv = float64(cv)
-			default:
-				valid = false
-			}
-
-			if !valid {
-				reply.Invalid += 1
-				continue
-			}
-			fv.Value = vv
-			items = append(items, fv)
-		*/
-
 		var err error
-		if v.Type == g.LOG {
+		if newV.Type == g.LOG {
 			fs := &sender.LogMetricItem{
-				Metric:    v.Metric,
-				Endpoint:  v.Endpoint,
-				Timestamp: v.Timestamp,
-				Step:      int(v.Step),
-				Tags:      cutils.DictedTagstring(v.Tags),
+				Metric:    newV.Metric,
+				Endpoint:  newV.Endpoint,
+				Timestamp: newV.Timestamp,
+				Step:      int(newV.Step),
+				Tags:      cutils.DictedTagstring(newV.Tags),
 			}
-			switch cv := v.Value.(type) {
+			switch cv := newV.Value.(type) {
 			case string:
 				fs.Value = cv
 			case float64:
@@ -204,26 +195,26 @@ func RecvMetricValues(args []*cmodel.MetricValue, reply *cmodel.TransferResponse
 			log_items = append(log_items, fs)
 		} else {
 			fv := &cmodel.MetaData{
-				Metric:      v.Metric,
-				Endpoint:    v.Endpoint,
-				Timestamp:   v.Timestamp,
-				Step:        v.Step,
-				CounterType: v.Type,
-				Tags:        cutils.DictedTagstring(v.Tags), //TODO tags键值对的个数,要做一下限制
+				Metric:      newV.Metric,
+				Endpoint:    newV.Endpoint,
+				Timestamp:   newV.Timestamp,
+				Step:        newV.Step,
+				CounterType: newV.Type,
+				Tags:        cutils.DictedTagstring(newV.Tags), //TODO tags键值对的个数,要做一下限制
 			}
 			valid := true
 			var vv float64
-			switch cv := v.Value.(type) {
+			switch cv := newV.Value.(type) {
 			case string:
 				vv, err = strconv.ParseFloat(cv, 64)
 				if err != nil {
 					fs := &sender.LogMetricItem{
-						Metric:    v.Metric,
-						Endpoint:  v.Endpoint,
-						Timestamp: v.Timestamp,
+						Metric:    newV.Metric,
+						Endpoint:  newV.Endpoint,
+						Timestamp: newV.Timestamp,
 						Value:     cv,
-						Step:      int(v.Step),
-						Tags:      cutils.DictedTagstring(v.Tags),
+						Step:      int(newV.Step),
+						Tags:      cutils.DictedTagstring(newV.Tags),
 					}
 					log_items = append(log_items, fs)
 					continue

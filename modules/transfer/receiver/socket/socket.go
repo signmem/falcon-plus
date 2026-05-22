@@ -4,6 +4,7 @@ import (
 	"github.com/signmem/falcon-plus/modules/transfer/g"
 	"log"
 	"net"
+	"time"
 )
 
 func StartSocket() {
@@ -24,12 +25,14 @@ func StartSocket() {
 		log.Println("socket listening", addr)
 	}
 
-	defer listener.Close()
+	log.Printf("socket listening on %s success", addr)
+
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Println("listener.Accept occur error:", err)
+			log.Printf("listener.Accept error: %v, retry after 100ms", err)
+			time.Sleep(100 * time.Millisecond)
 			continue
 		}
 

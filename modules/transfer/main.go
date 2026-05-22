@@ -6,6 +6,7 @@ import (
 	"github.com/signmem/falcon-plus/modules/transfer/g"
 	"github.com/signmem/falcon-plus/modules/transfer/http"
 	"github.com/signmem/falcon-plus/modules/transfer/proc"
+	localrpc "github.com/signmem/falcon-plus/modules/transfer/receiver/rpc"
 	"github.com/signmem/falcon-plus/modules/transfer/receiver"
 	"github.com/signmem/falcon-plus/common/redisdb"
 	"github.com/signmem/falcon-plus/modules/transfer/sender"
@@ -29,6 +30,8 @@ func init () {
 
 	// global config
 	g.ParseConfig(*cfg)
+
+	localrpc.InitIllegalCharRegexp()
 
 	redisdb.Server = g.Config().Redis.Server + ":" + g.Config().Redis.Port
 	redisdb.MaxIdle = g.Config().Redis.MaxIdle

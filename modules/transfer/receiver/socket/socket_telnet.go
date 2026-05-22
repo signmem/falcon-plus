@@ -14,10 +14,15 @@ import (
 )
 
 func socketTelnetHandle(conn net.Conn) {
-	defer conn.Close()
+
+	defer func() {
+		_ = conn.Close()
+	}()
+
 
 	items := []*cmodel.MetaData{}
-	buf := bufio.NewReader(conn)
+	// buf := bufio.NewReader(conn)
+	buf := bufio.NewReaderSize(conn, 1024*64)
 
 	cfg := g.Config()
 	timeout := time.Duration(cfg.Socket.Timeout) * time.Second
@@ -29,28 +34,27 @@ func socketTelnetHandle(conn net.Conn) {
 			break
 		}
 
-		line = strings.Trim(line, "\n")
+		line = strings.TrimSpace(line)
 
-		if line == "quit" {
-			break
-		}
-
-		if line == "" {
+		switch {
+		case line == "quit":
+			return
+		case line == "":
 			continue
 		}
 
-		t := strings.Fields(line)
-		if len(t) < 2 {
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
 			continue
 		}
 
-		cmd := t[0]
+		cmd := fields[0]
 
 		if cmd != "update" {
 			continue
 		}
 
-		item, err := convertLine2MetaData(t[1:])
+		item, err := convertLine2MetaData(fields[1:])
 		if err != nil {
 			continue
 		}
@@ -85,12 +89,12 @@ func convertLine2MetaData(fields []string) (item *cmodel.MetaData, err error) {
 	endpoint, metric := fields[0], fields[1]
 	ts, err := strconv.ParseInt(fields[2], 10, 64)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	v, err := strconv.ParseFloat(fields[3], 64)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	type_ := g.COUNTER
@@ -99,8 +103,7 @@ func convertLine2MetaData(fields []string) (item *cmodel.MetaData, err error) {
 	}
 
 	if type_ != g.DERIVE && type_ != g.GAUGE && type_ != g.COUNTER {
-		err = fmt.Errorf("invalid_counter_type")
-		return
+		return nil,fmt.Errorf("invalid_counter_type")
 	}
 
 	var step int64 = g.DEFAULT_STEP
@@ -124,6 +127,15 @@ func convertLine2MetaData(fields []string) (item *cmodel.MetaData, err error) {
 		}
 	}
 
+	now := time.Now().Unix()
+	if ts < now-172800 || ts > now+172800 {
+		ts = now
+	}
+
+	if step <= 0 {
+		step = g.DEFAULT_STEP
+	}
+
 	item = &cmodel.MetaData{
 		Metric:      metric,
 		Endpoint:    endpoint,
@@ -131,7 +143,7 @@ func convertLine2MetaData(fields []string) (item *cmodel.MetaData, err error) {
 		Step:        step,
 		Value:       v,
 		CounterType: type_,
-		Tags:        make(map[string]string),
+		Tags:        nil,
 	}
 
 	return item, nil

@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/rpc"
 	"net/rpc/jsonrpc"
+	"time"
 )
 
 func StartRpc() {
@@ -22,9 +23,9 @@ func StartRpc() {
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
 		log.Fatalf("listen %s fail: %s", addr, err)
-	} else {
-		log.Println("rpc listening", addr)
 	}
+
+	log.Println("rpc listening", addr)
 
 	server := rpc.NewServer()
 	server.Register(new(Transfer))
@@ -33,8 +34,10 @@ func StartRpc() {
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Println("listener.Accept occur error:", err)
+			time.Sleep(100 * time.Millisecond)
 			continue
 		}
+
 		go server.ServeCodec(jsonrpc.NewServerCodec(conn))
 	}
 }

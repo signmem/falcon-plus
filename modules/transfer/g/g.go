@@ -18,7 +18,7 @@ import (
 // 0.0.17: remove migrating, which is implemented in graph
 
 const (
-	VERSION      = "0.1.0"
+	VERSION      = "0.2.0"
 	GAUGE        = "GAUGE"
 	COUNTER      = "COUNTER"
 	DERIVE       = "DERIVE"

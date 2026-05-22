@@ -34,15 +34,19 @@ func initConnPools() {
 	GraphConnPools = backend.CreateSafeRpcConnPools(cfg.Graph.MaxConns, cfg.Graph.MaxIdle,
 		cfg.Graph.ConnTimeout, cfg.Graph.CallTimeout, graphInstances.ToSlice())
 
+
+	if cfg.Kafka.Enabled || cfg.Kafka.LogEnabled {
+		initKafkaConfig()
+	}
+
 	//added by vincent.zhang for sending to kafka
 	if cfg.Kafka.Enabled {
-		initKafkaConfig()
 		// single kafka producer method
 		p, err := NewKafkaProducer(cfg.Kafka.Topic, cfg.Kafka.Address)
 		if err == nil {
 			kafkaProducer = p
 		} else {
-			log.Println("new kafka producer fail, error: ", err.Error())
+			log.Panic("new kafka producer fail, error: ", err.Error())
 		}
 		//end
 		// producer pool method
@@ -62,14 +66,13 @@ func initConnPools() {
 		//end
 	}
 
-	if cfg.Kafka.LogEnabled {
-		initKafkaConfig()
+	if cfg.Kafka.LogEnabled  {
 		// single kafka producer method
 		p, err := NewKafkaProducer(cfg.Kafka.LogTopic, cfg.Kafka.Address)
 		if err == nil {
 			kafkaLogProducer = p
 		} else {
-			log.Println("new kafka Log producer fail, error: ", err.Error())
+			log.Panic("new kafka Log producer fail, error: ", err.Error())
 		}
 	}
 }
@@ -79,7 +82,12 @@ func DestroyConnPools() {
 	GraphConnPools.Destroy()
 	TsdbConnPoolHelper.Destroy()
 	//added by vincent.zhang for sending to kafka
-	kafkaProducer.Close() // single kafka producer method
-	kafkaLogProducer.Close()
-	//KafkaPool.Destroy()	// producer pool method
+	if kafkaProducer != nil {
+		kafkaProducer.Close() // single kafka producer method
+	}
+	if kafkaProducer != nil {
+		kafkaLogProducer.Close()
+		//KafkaPool.Destroy()	// producer pool method
+	}
+
 }
