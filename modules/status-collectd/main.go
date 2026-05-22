@@ -9,20 +9,31 @@ import (
 	"github.com/signmem/falcon-plus/modules/status-collectd/proc"
 	"github.com/signmem/falcon-plus/modules/status-collectd/selector"
 	"log"
-	_ "os"
-	_ "os/signal"
-	"runtime"
-	_ "syscall"
+	"os"
+	"context"
+	"os/signal"
+	_ "runtime"
+	"syscall"
 	"sync"
 	"time"
 	myhttp "github.com/signmem/falcon-plus/modules/status-collectd/http"
 )
 
 var (
-	Config *viper.Viper
-	disableSend bool
-	enableCnt bool
-	RunStat bool
+	Config        *viper.Viper
+	disableSend   bool
+	enableCnt     bool
+	RunStat       bool
+	roleLock      sync.RWMutex
+	runStatLock   sync.Mutex
+)
+
+// 一次性初始化全局资源
+var (
+	ch          = make(chan *kfk.MItem, 200)
+	ticker      = time.NewTicker(1 * time.Minute)
+	ticker2     = time.NewTicker(1 * time.Minute)
+	ticker3     = time.NewTicker(1 * time.Minute)
 )
 
 func contains(s []string, e string) bool {
@@ -34,52 +45,132 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-// modify channel by terry.zeng
-// func fetchCounter(ch chan *TsdbItem, wg *sync.WaitGroup, timeout time.Duration) {
-
+// ------------- fetchCounter 已修复 -------------
 func fetchCounter(ch chan *kfk.MItem, wg *sync.WaitGroup, timeout time.Duration) {
-	for _, falconType := range [5]string{"transfer", "graph", "kafka_consumer", "trend", "judge"} {
+	falconTypes := []string{"transfer", "graph", "kafka_consumer", "trend", "judge"}
 
+	for _, falconType := range falconTypes {
 		sKey := fmt.Sprintf("falconServers.%s", falconType)
 		for _, server := range Config.GetStringSlice(sKey) {
+			c, err := kfk.ClientFactory(falconType, server, timeout)
+			if err != nil {
+				log.Printf("[ERROR] create client failed: %s %s %v", falconType, server, err)
+				continue
+			}
 
-			c, _ := kfk.ClientFactory(falconType, server, timeout)
 			wg.Add(1)
-			go func(c kfk.FalconCommon, falconType string, server string) {
-				defer wg.Done()
-				defer c.Close()
+			go func(c kfk.FalconCommon, ft string, srv string) {
+				defer func() {
+					if c != nil {
+						c.Close()
+					}
+					wg.Done()
+				}()
 
-				if selector.Role == "slave" {
-					log.Println("[DEBUG] fetchCounter() go routine break.")
-					RunStat = false
-					runtime.Goexit()
+				roleLock.RLock()
+				isSlave := selector.Role == "slave"
+				roleLock.RUnlock()
+
+				if isSlave {
+					return
 				}
 
 				counters, err := c.Counter()
 				if err != nil {
-					log.Println(err)
+					log.Printf("[ERROR] counter failed: %s %s %v", ft, srv, err)
 					return
 				}
 
 				for _, counter := range counters {
-					mKey := fmt.Sprintf("falconCounterMetrics.%s.%s", falconType, counter.Name)
+					mKey := fmt.Sprintf("falconCounterMetrics.%s.%s", ft, counter.Name)
 					mType := Config.GetString(mKey)
 					if mType == "" {
 						continue
 					}
 
-					// 为 qps 指标发一份 Counter 数据
+					var item *kfk.MItem
 					if enableCnt && mType == "qps" {
-						ch <- counter.ToKafkaItem4Cnt(falconType, mType, server)
+						item = counter.ToKafkaItem4Cnt(ft, mType, srv)
 					} else {
-						ch <- counter.ToKafkaItem(falconType, mType, server)
+						item = counter.ToKafkaItem(ft, mType, srv)
+					}
+
+					select {
+					case ch <- item:
+					case <-time.After(3 * time.Second):
+						log.Printf("[WARN] channel full, drop item: %s %s", ft, srv)
 					}
 				}
 			}(c, falconType, server)
-
 		}
 	}
-	wg.Wait()
+}
+
+// ------------- fetchHealth 修复 -------------
+func fetchHealth(ch chan *kfk.MItem, wg *sync.WaitGroup, timeout time.Duration) {
+	falconServers := Config.GetStringMapStringSlice("falconServers")
+
+	for ft, servers := range falconServers {
+		for _, srv := range servers {
+			c, err := kfk.ClientFactory(ft, srv, timeout)
+			if err != nil {
+				continue
+			}
+
+			wg.Add(1)
+			go func(c kfk.FalconCommon, ft string, srv string) {
+				defer func() {
+					if c != nil {
+						c.Close()
+					}
+					wg.Done()
+				}()
+
+				roleLock.RLock()
+				isSlave := selector.Role == "slave"
+				roleLock.RUnlock()
+				if isSlave {
+					return
+				}
+
+				health, err := c.Health()
+				item := kfk.HealthToKafkaItem(ft, srv, err == nil && health)
+
+				select {
+				case ch <- item:
+				case <-time.After(3 * time.Second):
+				}
+			}(c, ft, srv)
+		}
+	}
+}
+
+// ------------- fetchLocalHealth 修复 -------------
+func fetchLocalHealth(ch chan *kfk.MItem, wg *sync.WaitGroup) {
+	roleLock.RLock()
+	isSlave := selector.Role == "slave"
+	roleLock.RUnlock()
+	if isSlave {
+		return
+	}
+
+	localProc := []*proc.SCount{
+		proc.SendToKafkaCntTotal,
+		proc.SendToKafkaCntDrop,
+		proc.SendToKafkaCntSuccess,
+	}
+
+	for _, name := range localProc {
+		wg.Add(1)
+		go func(name *proc.SCount) {
+			defer wg.Done()
+			item := kfk.GetLocalInc(name)
+			select {
+			case ch <- item:
+			case <-time.After(3 * time.Second):
+			}
+		}(name)
+	}
 }
 
 func InitConfig() {
@@ -95,152 +186,122 @@ func InitConfig() {
 	Config = v
 }
 
-// func fetchHealth(ch chan *TsdbItem, wg *sync.WaitGroup, timeout time.Duration) {
-// modify channel from terry.zeng
-func fetchHealth(ch chan *kfk.MItem, wg *sync.WaitGroup, timeout time.Duration) {
-	falconServers := Config.GetStringMapStringSlice("falconServers")
+func init() {
+	cfg := flag.String("c", "cfg.json", "specify config file")
+	flag.Parse()
 
-	for falconType, servers := range falconServers {
-		for _, server := range servers {
+	g.ParseConfig(*cfg)
+	g.Logger = g.InitLog()
+	InitConfig()
 
-			c, _ := kfk.ClientFactory(falconType, server, timeout)
-			wg.Add(1)
+	disableSend = g.Config().DisableSend
+	enableCnt = g.Config().EnableCnt
+	kfk.Topic = g.Config().Kafka.Topic
+	kfk.KafkaServer = g.Config().Kafka.Servers
 
-			go func(c kfk.FalconCommon, falconType string, server string) {
+	// 初始化 Kafka
+	kfk.InitKafkaProducer()
+	kfk.InitAsyncProducer()
+}
 
-				defer wg.Done()
-				defer c.Close()
+// ------------- 消费 ch 并发送到 Kafka -------------
+func consumeAndSend(ctx context.Context) {
+	var itemList []*kfk.MItem
+	t := time.NewTicker(3 * time.Second)
+	defer t.Stop()
 
-				if selector.Role == "slave" {
-					log.Println("[DEBUG] fetchHealth() go routine break.")
-					RunStat = false
-					runtime.Goexit()
-				}
-
-				health, err := c.Health()
-				ch <- kfk.HealthToKafkaItem(falconType, server, err == nil && health)
-			}(c, falconType, server)
-
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case item := <-ch:
+			if item != nil {
+				itemList = append(itemList, item)
+			}
+			// 批量发送
+			if len(itemList) >= 60 {
+				kfk.Produce(itemList)
+				itemList = nil
+			}
+		case <-t.C:
+			if len(itemList) > 0 {
+				kfk.Produce(itemList)
+				itemList = nil
+			}
 		}
 	}
 }
 
-func fetchLocalHealth(ch chan *kfk.MItem, wg *sync.WaitGroup) {
-	var localProc []*proc.SCount
-	localProc = append(localProc, proc.SendToKafkaCntTotal)
-	localProc = append(localProc, proc.SendToKafkaCntDrop)
-	localProc = append(localProc, proc.SendToKafkaCntSuccess)
-
-	if selector.Role == "slave" {
-		log.Println("[DEBUG] fetchLocalHealth() go routine break.")
-		RunStat = false
-		runtime.Goexit()
-	}
-
-	for _, name := range localProc {
-		wg.Add(1)
-		go func(name *proc.SCount) {
-			defer wg.Done()
-			ch <- kfk.GetLocalInc(name)
-		}(name)
-	}
-}
-
-
-func init () {
-	cfg := flag.String("c", "cfg.json", "specify config file")
-	flag.Parse()
-
-	// global config
-	g.ParseConfig(*cfg)
-	g.Logger = g.InitLog()
-
-	flag.Parse()
-	// init config
-	InitConfig()
-	disableSend = g.Config().DisableSend
-	enableCnt  = g.Config().EnableCnt
-	kfk.Topic = g.Config().Kafka.Topic
-	kfk.KafkaServer = g.Config().Kafka.Servers
-
-}
-
-
 func main() {
-
 	httpListen := g.Config().HTTP.Listen + ":" + g.Config().HTTP.Port
 	go myhttp.Start(httpListen)
 	go selector.Start()
 
-	// ch := make(chan *TsdbItem, 20)
-	// sender := NewTsdbSender(Config.GetString("tsdbServer"), disableSend)
-	// go sender.Start(ch, time.Second)
+	// 启动消费发送
+	ctx, cancel := context.WithCancel(context.Background())
+	go consumeAndSend(ctx)
 
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+
+	// 只启动一次定时任务
+	go taskLoop(ctx, fetchCounter, ch, 5*time.Second)
+	go taskLoop(ctx, fetchHealth, ch, 5*time.Second)
+	go taskLoopNoTimeout(ctx, fetchLocalHealth, ch)
+
+	// 主循环
 	for {
-
-		if selector.Role == "master"  {
-
-			ch := make(chan *kfk.MItem, 5)
-			MItemList := kfk.MItemList{}
-			go MItemList.Start(ch, 60)
-			var wg sync.WaitGroup
-
-			ticker := time.NewTicker(time.Minute * 1)
-
-			go func() {
-				for ; true; <-ticker.C {
-					fetchCounter(ch, &wg, time.Second*5)
-				}
-			}()
-
-			ticker2 := time.NewTicker(time.Minute * 1)
-			var wg2 sync.WaitGroup
-
-			go func() {
-
-				for ; true; <-ticker2.C {
-					fetchHealth(ch, &wg2, time.Second*5)
-				}
-			}()
-
-			ticker3 := time.NewTicker(time.Minute * 1)
-			var wg3 sync.WaitGroup
-			go func() {
-				
-				for ; true; <-ticker3.C {
-					fetchLocalHealth(ch, &wg3)
-				}
-			}()
-
-			/*
-			sigCh := make(chan os.Signal)
-			signal.Notify(sigCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-			s := <-sigCh
-
-			// wait running collect goroutine
-			log.Printf("Get signal: %s, Waiting collect...\n", s)
-			*/
-
-			// wait and stop collect counter
-			wg.Wait()
-			ticker.Stop()
-
-			// wait and stop collect health
-			wg2.Wait()
-			ticker2.Stop()
-
-			/*
-			for i := 0; i < 10; i++ {
-				if len(ch) == 0 && sender.IsClear() {
-					break
-				}
-				log.Printf("Wait 200 ms for sender #%d", i)
-				time.Sleep(time.Millisecond * 200)
-			}
-			*/
+		select {
+		case <-sigCh:
+			log.Println("exit signal received")
+			cancel()
+			goto EXIT
+		default:
 		}
-		time.Sleep( 10 * time.Second )
+
+		roleLock.RLock()
+		isMaster := selector.Role == "master"
+		roleLock.RUnlock()
+
+		if isMaster {
+			time.Sleep(2 * time.Second)
+		} else {
+			time.Sleep(10 * time.Second)
+		}
 	}
 
-	select {}
+EXIT:
+	log.Println("waiting exit...")
+	time.Sleep(2 * time.Second)
+	log.Println("exited")
+}
+
+func taskLoop(ctx context.Context, f func(chan *kfk.MItem, *sync.WaitGroup, time.Duration), ch chan *kfk.MItem, timeout time.Duration) {
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+	var wg sync.WaitGroup
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			f(ch, &wg, timeout)
+		}
+	}
+}
+
+func taskLoopNoTimeout(ctx context.Context, f func(chan *kfk.MItem, *sync.WaitGroup), ch chan *kfk.MItem) {
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+	var wg sync.WaitGroup
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			f(ch, &wg)
+		}
+	}
 }
