@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"context"
 )
 
 func RedisServiceWrite(service string, hostname string) ( status bool, err error) {
@@ -19,6 +20,23 @@ func RedisServiceWrite(service string, hostname string) ( status bool, err error
 	}
 	return true, nil
 }
+
+// RedisServiceWriteTimeout  Redis
+func RedisServiceWriteTimeout(ctx context.Context, service string,
+	hostname string) (status bool, err error) {
+
+	key := "/" + service + "/" + hostname
+	timeNow := time.Now().Unix()
+	timeNowStr := strconv.FormatInt(timeNow, 10)
+
+	//  ctx  Redis /
+	err = GSetCtx(ctx, Client, key, timeNowStr)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 
 func ReidsServerRead(service string, hostname string) (value []byte, err error) {
 	key := "/" + service + "/" + hostname

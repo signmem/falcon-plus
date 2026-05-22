@@ -76,3 +76,10 @@ func GSet(client *redis9.Client, key string, value string) (err error) {
 	err = client.Set(ctx, key, value, 0).Err()
 	return
 }
+
+// GSetCtx with context set  Redis SET
+func GSetCtx(ctx context.Context, client *redis9.Client, key string,
+	value string) (err error) {
+		err = client.Set(ctx, key, value, 0).Err()
+		return
+}
