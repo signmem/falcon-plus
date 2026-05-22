@@ -55,8 +55,8 @@ func cmdbApiQuery(api string, query string ) (mqAppStruct  CmdbTotalObject, err 
 		return mqAppStruct, err
 	}
 
-	responseBody, err := ioutil.ReadAll(response)
 	defer response.Close()
+	responseBody, err := ioutil.ReadAll(response)
 
 	if err != nil {
 		g.Logger.Errorf("CmdbAppQuery() %s response err ", query)
