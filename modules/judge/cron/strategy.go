@@ -32,17 +32,30 @@ func syncStrategies() {
 }
 
 func rebuildStrategyMap(strategiesResponse *model.StrategiesResponse) {
-	// endpoint:metric => [strategy1, strategy2 ...]
-	m := make(map[string][]model.Strategy)
+
+
+	estimatedSize := 0
 	for _, hs := range strategiesResponse.HostStrategies {
+		estimatedSize += len(hs.Strategies)
+	}
+
+	// endpoint:metric => [strategy1, strategy2 ...]
+	//  1. 新建一个巨大的空 Map
+	m := make(map[string][]model.Strategy, estimatedSize)
+
+	// 2. 遍历所有主机策略，填充这个 Map
+	for _, hs := range strategiesResponse.HostStrategies {
+
 		hostname := hs.Hostname
+
 		if g.Config().Debug && hostname == g.Config().DebugHost {
 			log.Println(hostname, "strategies:")
 			bs, _ := json.Marshal(hs.Strategies)
 			fmt.Println(string(bs))
 		}
+
 		for _, strategy := range hs.Strategies {
-			key := fmt.Sprintf("%s/%s", hostname, strategy.Metric)
+			key :=  hostname + "/" +  strategy.Metric
 			if _, exists := m[key]; exists {
 				m[key] = append(m[key], strategy)
 			} else {
@@ -51,6 +64,8 @@ func rebuildStrategyMap(strategiesResponse *model.StrategiesResponse) {
 		}
 	}
 
+
+	// 3. 原子替换全局 Map
 	g.StrategyMap.ReInit(m)
 }
 

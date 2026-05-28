@@ -46,11 +46,36 @@ func InitHbsClient() {
 	}
 }
 
+/*
 func (this *SafeStrategyMap) ReInit(m map[string][]model.Strategy) {
 	this.Lock()
 	defer this.Unlock()
 	this.M = m
 }
+*/
+
+func (this *SafeStrategyMap) ReInit(m map[string][]model.Strategy) {
+    this.Lock()
+    defer this.Unlock()
+
+    // 关键优化：复用已有 map，不新建，大幅降低内存占用
+    if this.M == nil {
+        // 第一次初始化：创建新map
+        this.M = make(map[string][]model.Strategy, len(m))
+    } else {
+        // 复用旧map：清空所有key，不创建新map
+        for k := range this.M {
+            delete(this.M, k)
+        }
+    }
+
+    // 把新数据导入到复用的map里
+    for k, v := range m {
+        this.M[k] = v
+    }
+}
+
+
 
 func (this *SafeStrategyMap) Get() map[string][]model.Strategy {
 	this.RLock()
@@ -58,11 +83,35 @@ func (this *SafeStrategyMap) Get() map[string][]model.Strategy {
 	return this.M
 }
 
+/*
 func (this *SafeExpressionMap) ReInit(m map[string][]*model.Expression) {
 	this.Lock()
 	defer this.Unlock()
 	this.M = m
 }
+*/
+
+func (this *SafeExpressionMap) ReInit(m map[string][]*model.Expression) {
+    this.Lock()
+    defer this.Unlock()
+
+    // 关键优化：复用已有 map，不新建，大幅降低内存占用
+    if this.M == nil {
+        // 第一次初始化：创建新map
+        this.M = make(map[string][]*model.Expression, len(m))
+    } else {
+        // 复用旧map：清空所有key，不创建新map
+        for k := range this.M {
+            delete(this.M, k)
+        }
+    }
+
+    // 把新数据导入到复用的map里
+    for k, v := range m {
+        this.M[k] = v
+    }
+}
+
 
 func (this *SafeExpressionMap) Get() map[string][]*model.Expression {
 	this.RLock()
@@ -83,11 +132,35 @@ func (this *SafeEventMap) Set(key string, event *model.Event) {
 	this.M[key] = event
 }
 
+/*
 func (this *SafeFilterMap) ReInit(m map[string]string) {
 	this.Lock()
 	defer this.Unlock()
 	this.M = m
 }
+*/
+
+func (this *SafeFilterMap) ReInit(m map[string]string) {
+    this.Lock()
+    defer this.Unlock()
+
+    // 关键优化：复用已有 map，不新建，大幅降低内存占用
+    if this.M == nil {
+        // 第一次初始化：创建新map
+        this.M = make(map[string]string, len(m))
+    } else {
+        // 复用旧map：清空所有key，不创建新map
+        for k := range this.M {
+            delete(this.M, k)
+        }
+    }
+
+    // 把新数据导入到复用的map里
+    for k, v := range m {
+        this.M[k] = v
+    }
+}
+
 
 func (this *SafeFilterMap) Exists(key string) bool {
 	this.RLock()

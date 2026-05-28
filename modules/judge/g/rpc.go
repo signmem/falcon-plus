@@ -11,7 +11,7 @@ import (
 )
 
 type SingleConnRpcClient struct {
-	sync.Mutex
+	sync.RWMutex
 	rpcClient   *rpc.Client
 	RpcServers  []string
 	Timeout     time.Duration
@@ -40,11 +40,12 @@ func (this *SingleConnRpcClient) insureConn() {
 
 		for _, s := range this.RpcServers {
 			this.rpcClient, err = net.JsonRpcClient("tcp", s, this.Timeout)
+			// this.rpcClient, err = rpc.DialTimeout("tcp", s, this.Timeout)
 			if err == nil {
+				log.Printf("connect hbs %s success", s)
 				return
 			}
-
-			log.Printf("dial %s fail: %s", s, err)
+			log.Printf("dial hbs %s fail: %v", s, err)
 		}
 
 		if retry > 6 {
@@ -59,13 +60,49 @@ func (this *SingleConnRpcClient) insureConn() {
 
 func (this *SingleConnRpcClient) Call(method string, args interface{}, reply interface{}) error {
 
-	this.Lock()
-	defer this.Unlock()
-
 	this.insureConn()
 
+	this.Lock()
+	client := this.rpcClient
+	this.Unlock()
+
+	if client == nil {
+		return errors.New("rpc client not ready")
+	}
+
+	timeout := time.After(this.CallTimeout)
 	done := make(chan error, 1)
+
 	go func() {
+		done <- client.Call(method, args, reply)
+	}()
+
+	select {
+	case <-timeout:
+		this.close()
+		return errors.New("call hbs timeout")
+	case err := <-done:
+		if err != nil {
+			this.close()
+		}
+		return err
+	}
+
+
+	/*
+	//  1. 建立连接
+	this.insureConn()
+
+	// 核心修复：连接失败，直接返回错误，避免空指针
+
+	done := make(chan error, 1)
+
+	go func() {
+		// 现在这里绝对安全，不会 panic
+		if this.rpcClient == nil {
+			done <- errors.New("rpc client is nil")
+			return
+		}
 		done <- this.rpcClient.Call(method, args, reply)
 	}()
 
@@ -82,4 +119,5 @@ func (this *SingleConnRpcClient) Call(method string, args interface{}, reply int
 	}
 
 	return err
+	*/
 }

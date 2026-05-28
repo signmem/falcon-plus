@@ -25,23 +25,6 @@ func (s *MItemList) clear() {
 
 func (s *MItemList) Start(itemCh chan *MItem,  duration time.Duration) {
 
-	/*
-	// ticker := time.NewTicker(duration * time.Second)
-
-	for {
-		select {
-		case <-ticker.C:
-			s.push()
-		case item := <-itemCh:
-			s.merge(item)
-			if len(s.items) >= 100 {
-				s.push()
-			}
-		}
-		time.Sleep(1*time.Microsecond)
-	}
-	*/
-
 
 	for {
 		item := <- itemCh
