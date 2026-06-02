@@ -2,6 +2,7 @@ package kfk
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/signmem/falcon-plus/modules/status-collectd/cmdb"
 	"github.com/signmem/falcon-plus/modules/status-collectd/g"
@@ -10,11 +11,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
-	"time"
-	"encoding/json"
 	"sync"
+	"time"
 )
 
 var (
@@ -23,11 +22,12 @@ var (
 )
 
 type Counter struct {
-	Name string
-	Cnt  int64
-	Qps  int64
-	Time string
+	Name  string     `json:"Name"`
+	Cnt   int64      `json:"Cnt"`
+	Qps   int64      `json:"Qps"`
+	Time  string     `json:"Time"` 
 }
+
 
 func getHostName() string {
 	if LocalHostName == "" {
@@ -126,17 +126,27 @@ func (c *Counter) ToKafkaItem4Cnt(falconType string, metricType string, server s
 
 	ipaddr, port := unpackServer(server)
 
-	if cmdb.HostList[ipaddr] == "" {
-		hostname := cmdb.GetCMDBServerName(ipaddr)
-		mutex.Lock()
-		cmdb.HostList[ipaddr] = hostname
-		mutex.Unlock()
+	mutex.Lock()
+	if cmdb.HostList == nil {
+		cmdb.HostList = make(map[string]string)
 	}
 
 	endpoint := cmdb.HostList[ipaddr]
+	mutex.Unlock()
+
+	if endpoint == "" {
+		endpoint := cmdb.GetCMDBServerName(ipaddr)
+		mutex.Lock()
+		cmdb.HostList[ipaddr] = endpoint
+		mutex.Unlock()
+	}
 
 	// name 做区分
 	name := fmt.Sprintf("falcon.%s.%s.c", falconType, c.Name)
+
+	if g.Config().Debug {
+		g.Logger.Infof("ToKafkaItem4Cnt metric : %s value: %f endpoint: %s", name, c.Cnt, endpoint)
+	}
 
 	tagName := g.Config().Cluster
 	var tags string
@@ -168,14 +178,20 @@ func (c *Counter) ToKafkaItem(falconType string, metricType string, server strin
 
 	ipaddr, port := unpackServer(server)
 
-	if cmdb.HostList[ipaddr] == "" {
-		hostname := cmdb.GetCMDBServerName(ipaddr)
-		mutex.Lock()
-		cmdb.HostList[ipaddr] = hostname
-		mutex.Unlock()
+	mutex.Lock()
+	if cmdb.HostList == nil {
+		cmdb.HostList = make(map[string]string)
 	}
 
 	endpoint := cmdb.HostList[ipaddr]
+	mutex.Unlock()
+
+	if endpoint == "" {
+		endpoint = cmdb.GetCMDBServerName(ipaddr)
+		mutex.Lock()
+		cmdb.HostList[ipaddr] = endpoint
+		mutex.Unlock()
+	}
 
 	name := fmt.Sprintf("falcon.%s.%s", falconType, c.Name)
 
@@ -184,6 +200,10 @@ func (c *Counter) ToKafkaItem(falconType string, metricType string, server strin
 		value = float64(c.Qps)
 	} else {
 		value = float64(c.Cnt)
+	}
+
+	if g.Config().Debug {
+		g.Logger.Infof("ToKafkaItemCnt metric : %s value: %f endpoint: %s", name, value, endpoint)
 	}
 
 	tagName := g.Config().Cluster
@@ -235,14 +255,20 @@ func HealthToKafkaItem(falconType string, server string, health bool) *MItem {
 
 	ipaddr, port := unpackServer(server)
 
-	if cmdb.HostList[ipaddr] == "" {
-		hostname := cmdb.GetCMDBServerName(ipaddr)
-		mutex.Lock()
-		cmdb.HostList[ipaddr] = hostname
-		mutex.Unlock()
+	mutex.Lock()
+	if cmdb.HostList == nil {
+		cmdb.HostList = make(map[string]string)
 	}
 
 	endpoint := cmdb.HostList[ipaddr]
+	mutex.Unlock()
+
+	if endpoint == "" {
+		endpoint = cmdb.GetCMDBServerName(ipaddr)
+		mutex.Lock()
+		cmdb.HostList[ipaddr] = endpoint
+		mutex.Unlock()
+	}
 
 	name := fmt.Sprintf("falcon.%s.health", falconType)
 
@@ -500,6 +526,8 @@ func (c *FalconTrendClient) Counter() (Counters, error) {
 	return resp.Data, nil
 }
 
+
+/*
 type FalconJudgeClient struct {
 	FalconClient
 }
@@ -520,6 +548,33 @@ func (c *FalconJudgeClient) Counter() (Counters, error) {
 	return counters, nil
 
 }
+*/
+
+type JudgeCounterResp struct {
+        Data Counters `json:"data"`
+        Msg  string   `json:"msg"`
+}
+
+type FalconJudgeClient struct {
+        FalconClient
+}
+
+
+func (c *FalconJudgeClient) Counter() (Counters, error) {
+        body, err := c.get("/counter/all")
+        if err != nil {
+                return nil, err
+        }
+
+        var resp JudgeCounterResp
+        err = json.Unmarshal(body, &resp)
+        if err != nil {
+                return nil, err
+        }
+
+        return resp.Data, nil
+}
+
 
 func ClientFactory(falconType string, server string, timeout time.Duration) (FalconCommon, error) {
 	c, err := NewFalconClient(server, timeout)
@@ -535,8 +590,6 @@ func ClientFactory(falconType string, server string, timeout time.Duration) (Fal
 		fc = &FalconGraphClient{*c}
 	case "kafka_consumer":
 		fc = &FalconKafkaConsumerClient{*c}
-	case "trend":
-		fc = &FalconTrendClient{*c}
 	case "judge":
 		fc = &FalconJudgeClient{*c}
 	default:

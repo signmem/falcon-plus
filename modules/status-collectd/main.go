@@ -47,7 +47,7 @@ func contains(s []string, e string) bool {
 
 // ------------- fetchCounter 已修复 -------------
 func fetchCounter(ch chan *kfk.MItem, wg *sync.WaitGroup, timeout time.Duration) {
-	falconTypes := []string{"transfer", "graph", "kafka_consumer", "trend", "judge"}
+	falconTypes := []string{"transfer", "graph", "kafka_consumer", "judge"}
 
 	for _, falconType := range falconTypes {
 		sKey := fmt.Sprintf("falconServers.%s", falconType)
