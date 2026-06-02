@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"context"
 )
 
 var (
@@ -159,16 +158,30 @@ func RecvMetricValues(args []*cmodel.MetricValue, reply *cmodel.TransferResponse
 			hostname := newV.Endpoint
 
 			go func(service, hostname string) {
-				timeoutCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-				defer cancel()
+				conn := redisdb.Pool.Get()
+				defer conn.Close()
 
-				_, err := redisdb.RedisServiceWriteTimeout(timeoutCtx, service, hostname)
+				// timeoutCtx, cancel := context.WithTimeout(context.Background(), 1 * time.Second)
+				// defer cancel()
+
+				key := "/" + service + "/" + hostname
+				_, err := conn.Do("SET", key, time.Now().Unix(), "EX", 3600)
 				if err != nil {
 					proc.SendToRedisFailCnt.Incr()
-					log.Printf("redis write error: %v", err)
+					log.Printf("redis write error: service=%s, hostname=%s, err=%v", service, hostname, err)
 				} else {
 					proc.SendToRedisCnt.Incr()
 				}
+
+				/*
+				_, err := redisdb.RedisServiceWriteTimeout(timeoutCtx, service, hostname)
+				if err != nil {
+					proc.SendToRedisFailCnt.Incr()
+					log.Printf("redis write error: service=%s, hostname=%s, err=%v", service, hostname, err)
+				} else {
+					proc.SendToRedisCnt.Incr()
+				}
+				*/
 			}(service, hostname)
 		}
 		// edit by terry.zeng
