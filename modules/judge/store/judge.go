@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/judge/g"
+	"github.com/signmem/falcon-plus/modules/judge/proc"
 	"log"
 )
 
@@ -14,7 +15,17 @@ func Judge(L *SafeLinkedList, firstItem *model.JudgeItem, now int64) {
 }
 
 func CheckStrategy(L *SafeLinkedList, firstItem *model.JudgeItem, now int64) {
-	key := fmt.Sprintf("%s/%s", firstItem.Endpoint, firstItem.Metric)
+	// 检查策略告警
+	// 根据监控指标，找到对应的告警策略  Strategy
+
+	// 拼接 key = 机器名/指标名
+	// 从内存中获取所有策略
+	// 找到这条监控对应的策略列表
+	// 匹配标签（tag）
+	// 匹配成功 ---> 进入真正判断逻辑
+
+	key := firstItem.Endpoint + "/" + firstItem.Metric
+	// key := fmt.Sprintf("%s/%s", firstItem.Endpoint, firstItem.Metric)
 	strategyMap := g.StrategyMap.Get()
 	strategies, exists := strategyMap[key]
 	if !exists {
@@ -42,6 +53,13 @@ func CheckStrategy(L *SafeLinkedList, firstItem *model.JudgeItem, now int64) {
 }
 
 func judgeItemWithStrategy(L *SafeLinkedList, strategy model.Strategy, firstItem *model.JudgeItem, now int64) {
+
+	// 执行单条策略判断
+	// 解析告警函数（avg、max、diff、lookup、all (diff) 等）
+	// 执行计算 -->  判断是否触发告警
+	// 构造告警事件
+	// 判断是否需要发送告警
+
 	fn, err := ParseFuncFromString(strategy.Func, strategy.Operator, strategy.RightValue)
 	if err != nil {
 		log.Printf("[ERROR] parse func %s fail: %v. strategy id: %d", strategy.Func, err, strategy.Id)
@@ -66,6 +84,10 @@ func judgeItemWithStrategy(L *SafeLinkedList, strategy model.Strategy, firstItem
 }
 
 func sendEvent(event *model.Event) {
+
+	// 发送告警到 Redis
+	// 把告警事件推送到 Redis，供 alarm 模块消费
+
 	// update last event
 	g.LastEvents.Set(event.Id, event)
 
@@ -79,10 +101,28 @@ func sendEvent(event *model.Event) {
 	redisKey := fmt.Sprintf(g.Config().Alarm.QueuePattern, event.Priority())
 	rc := g.RedisConnPool.Get()
 	defer rc.Close()
-	rc.Do("LPUSH", redisKey, string(bs))
+	// rc.Do("LPUSH", redisKey, string(bs))
+	_, err = rc.Do("LPUSH", redisKey, string(bs))
+
+	proc.SendToRedisCntTotal.Incr()
+
+	if err != nil {
+		proc.SendToRedisCntSuccess.Incr()
+	} else {
+		proc.SendToRedisCntDrop.Incr()
+	}
+
 }
 
 func CheckExpression(L *SafeLinkedList, firstItem *model.JudgeItem, now int64) {
+
+	// 检查表达式告警
+	// 处理更复杂的告警表达式  通用表达式告警
+	// 支持多维度匹配
+	// 支持更灵活的 tag 筛选
+	// 支持按 endpoint、tag 键值对筛选
+	// 给当前监控数据生成多个 key，用于匹配表达式
+
 	keys := buildKeysFromMetricAndTags(firstItem)
 	if len(keys) == 0 {
 		return
@@ -118,6 +158,10 @@ func buildKeysFromMetricAndTags(item *model.JudgeItem) (keys []string) {
 }
 
 func filterRelatedExpressions(expressions []*model.Expression, firstItem *model.JudgeItem) []*model.Expression {
+
+	// 过滤相关表达式
+	// 从一堆表达式里，筛选出和当前监控数据相关的表达式
+
 	size := len(expressions)
 	if size == 0 {
 		return []*model.Expression{}
@@ -153,6 +197,9 @@ func filterRelatedExpressions(expressions []*model.Expression, firstItem *model.
 }
 
 func copyItemTags(item *model.JudgeItem) map[string]string {
+
+	// 复制 item tags
+
 	ret := make(map[string]string)
 	ret["endpoint"] = item.Endpoint
 	if item.Tags != nil && len(item.Tags) > 0 {
@@ -164,6 +211,11 @@ func copyItemTags(item *model.JudgeItem) map[string]string {
 }
 
 func judgeItemWithExpression(L *SafeLinkedList, expression *model.Expression, firstItem *model.JudgeItem, now int64) {
+
+	// 执行表达式判断
+	// 执行表达式告警计算，逻辑和策略判断一样
+
+
 	fn, err := ParseFuncFromString(expression.Func, expression.Operator, expression.RightValue)
 	if err != nil {
 		log.Printf("[ERROR] parse func %s fail: %v. expression id: %d", expression.Func, err, expression.Id)
@@ -189,6 +241,13 @@ func judgeItemWithExpression(L *SafeLinkedList, expression *model.Expression, fi
 }
 
 func sendEventIfNeed(historyData []*model.HistoryData, isTriggered bool, now int64, event *model.Event, maxStep int) {
+
+	// 核心告警判断
+	// 第一次触发  --->  发送 PROBLEM 告警
+	// 持续触发 -->  连续发送  最大次数 maxStep
+	// 恢复正常  -->  发送 OK 告警
+	// 防止频繁发送 -->  最小间隔控制
+
 	lastEvent, exists := g.LastEvents.Get(event.Id)
 	if isTriggered {
 		event.Status = "PROBLEM"

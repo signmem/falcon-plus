@@ -16,6 +16,8 @@ type Dto struct {
 func init() {
 	configCommonRoutes()
 	configInfoRoutes()
+	metricCheck()
+	metricGet()
 }
 
 func RenderJson(w http.ResponseWriter, v interface{}) {

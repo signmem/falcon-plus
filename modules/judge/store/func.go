@@ -301,3 +301,18 @@ func checkIsTriggered(leftValue float64, operator string, rightValue float64) (i
 
 	return
 }
+
+
+
+func GetBigMapCount() (sum int) {
+
+        sum = 0
+        arr := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"}
+        for i := 0; i < 16; i++ {
+                for j := 0; j < 16; j++ {
+                        sum += HistoryBigMap[arr[i]+arr[j]].Len()
+                }
+        }
+        return sum
+}
+

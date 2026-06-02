@@ -26,6 +26,9 @@ func (this *SingleConnRpcClient) close() {
 }
 
 func (this *SingleConnRpcClient) insureConn() {
+	this.Lock()
+	defer this.Unlock()
+
 	if this.rpcClient != nil {
 		return
 	}
@@ -40,12 +43,11 @@ func (this *SingleConnRpcClient) insureConn() {
 
 		for _, s := range this.RpcServers {
 			this.rpcClient, err = net.JsonRpcClient("tcp", s, this.Timeout)
-			// this.rpcClient, err = rpc.DialTimeout("tcp", s, this.Timeout)
 			if err == nil {
-				log.Printf("connect hbs %s success", s)
+				log.Printf("[INFO] insureConn connect hbs server %s success", s)
 				return
 			}
-			log.Printf("dial hbs %s fail: %v", s, err)
+			log.Printf("[ERROR] insureConn dial hbs %s fail: %v", s, err)
 		}
 
 		if retry > 6 {
@@ -70,6 +72,8 @@ func (this *SingleConnRpcClient) Call(method string, args interface{}, reply int
 		return errors.New("rpc client not ready")
 	}
 
+	log.Printf("[INFO] hbs connect success, start call: %s", method)
+
 	timeout := time.After(this.CallTimeout)
 	done := make(chan error, 1)
 
@@ -79,45 +83,17 @@ func (this *SingleConnRpcClient) Call(method string, args interface{}, reply int
 
 	select {
 	case <-timeout:
+		log.Printf("[ERROR] call hbs %s timeout", method)
 		this.close()
 		return errors.New("call hbs timeout")
 	case err := <-done:
 		if err != nil {
+			log.Printf("[ERROR] call hbs %s fail: %v", method, err)
 			this.close()
+		} else {
+			log.Printf("[INFO] call hbs %s success", method)
 		}
+
 		return err
 	}
-
-
-	/*
-	//  1. 建立连接
-	this.insureConn()
-
-	// 核心修复：连接失败，直接返回错误，避免空指针
-
-	done := make(chan error, 1)
-
-	go func() {
-		// 现在这里绝对安全，不会 panic
-		if this.rpcClient == nil {
-			done <- errors.New("rpc client is nil")
-			return
-		}
-		done <- this.rpcClient.Call(method, args, reply)
-	}()
-
-	var err error
-
-	select {
-	case <-time.After(this.CallTimeout):
-		err = errors.New("call hbs timeout")
-	case err = <-done:
-	}
-
-	if err != nil {
-		this.close()
-	}
-
-	return err
-	*/
 }

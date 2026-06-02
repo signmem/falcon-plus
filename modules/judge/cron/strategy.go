@@ -84,7 +84,8 @@ func rebuildExpressionMap(expressionResponse *model.ExpressionResponse) {
 	m := make(map[string][]*model.Expression)
 	for _, exp := range expressionResponse.Expressions {
 		for k, v := range exp.Tags {
-			key := fmt.Sprintf("%s/%s=%s", exp.Metric, k, v)
+			// key := fmt.Sprintf("%s/%s=%s", exp.Metric, k, v)
+			key := exp.Metric + "/" +  k + "=" + v
 			if _, exists := m[key]; exists {
 				m[key] = append(m[key], exp)
 			} else {
