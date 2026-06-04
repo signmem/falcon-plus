@@ -8,6 +8,7 @@ import (
 
 	"github.com/signmem/falcon-plus/common/model"
 	"github.com/signmem/falcon-plus/modules/judge/g"
+	"github.com/signmem/falcon-plus/modules/judge/store"
 )
 
 func SyncStrategies() {
@@ -64,6 +65,8 @@ func rebuildStrategyMap(strategiesResponse *model.StrategiesResponse) {
 		}
 	}
 
+	store.MapLock.Lock()
+	defer store.MapLock.Unlock()
 
 	// 3. 原子替换全局 Map
 	g.StrategyMap.ReInit(m)
@@ -94,6 +97,10 @@ func rebuildExpressionMap(expressionResponse *model.ExpressionResponse) {
 		}
 	}
 
+	// ========== 加写锁 ==========
+	store.MapLock.Lock()
+	defer store.MapLock.Unlock()
+
 	g.ExpressionMap.ReInit(m)
 }
 
@@ -101,7 +108,11 @@ func syncFilter() {
 	m := make(map[string]string)
 
 	//M map[string][]model.Strategy
+	// 加读锁
+	store.MapLock.Lock()
 	strategyMap := g.StrategyMap.Get()
+	store.MapLock.Unlock()
+
 	for _, strategies := range strategyMap {
 		for _, strategy := range strategies {
 			m[strategy.Metric] = strategy.Metric
@@ -109,7 +120,11 @@ func syncFilter() {
 	}
 
 	//M map[string][]*model.Expression
+	// 加读锁
+	store.MapLock.Lock()
 	expressionMap := g.ExpressionMap.Get()
+	store.MapLock.Unlock()
+
 	for _, expressions := range expressionMap {
 		for _, expression := range expressions {
 			m[expression.Metric] = expression.Metric

@@ -7,7 +7,16 @@ import (
 	"github.com/signmem/falcon-plus/modules/judge/g"
 	"github.com/signmem/falcon-plus/modules/judge/proc"
 	"log"
+	"sync"
 )
+
+
+// 全局读写锁：解决 expressionMap 并发读写崩溃 (修复falcon原生bug)
+var (
+	ExprLock sync.RWMutex // 新增
+	MapLock sync.Mutex   // 公共锁
+)
+
 
 func Judge(L *SafeLinkedList, firstItem *model.JudgeItem, now int64) {
 	CheckStrategy(L, firstItem, now)
@@ -26,6 +35,11 @@ func CheckStrategy(L *SafeLinkedList, firstItem *model.JudgeItem, now int64) {
 
 	key := firstItem.Endpoint + "/" + firstItem.Metric
 	// key := fmt.Sprintf("%s/%s", firstItem.Endpoint, firstItem.Metric)
+
+	// ========== 加读锁保护 ==========
+	MapLock.Lock()
+	defer MapLock.Unlock()
+
 	strategyMap := g.StrategyMap.Get()
 	strategies, exists := strategyMap[key]
 	if !exists {
@@ -107,9 +121,10 @@ func sendEvent(event *model.Event) {
 	proc.SendToRedisCntTotal.Incr()
 
 	if err != nil {
-		proc.SendToRedisCntSuccess.Incr()
-	} else {
 		proc.SendToRedisCntDrop.Incr()
+		log.Printf("[Error] push redis key: %s, value: %s, error %s",  redisKey, string(bs), err)
+	} else {
+		proc.SendToRedisCntSuccess.Incr()
 	}
 
 }
@@ -130,6 +145,10 @@ func CheckExpression(L *SafeLinkedList, firstItem *model.JudgeItem, now int64) {
 
 	// expression可能会被多次重复处理，用此数据结构保证只被处理一次
 	handledExpression := make(map[int]struct{})
+
+	// ========== 加读锁保护（崩溃点修复） ==========
+	MapLock.Lock()
+	defer MapLock.Unlock()
 
 	expressionMap := g.ExpressionMap.Get()
 	for _, key := range keys {
