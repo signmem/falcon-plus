@@ -14,14 +14,15 @@ import (
 func SyncStrategies() {
 	duration := time.Duration(g.Config().Hbs.Interval) * time.Second
 	for {
-		syncStrategies()
+		// 函数改名！避免递归死循环
+		syncAllStrategies()
 		syncExpression()
 		syncFilter()
 		time.Sleep(duration)
 	}
 }
 
-func syncStrategies() {
+func syncAllStrategies() {
 	var strategiesResponse model.StrategiesResponse
 	err := g.HbsClient.Call("Hbs.GetStrategies", model.NullRpcRequest{}, &strategiesResponse)
 	if err != nil {
@@ -34,15 +35,7 @@ func syncStrategies() {
 
 func rebuildStrategyMap(strategiesResponse *model.StrategiesResponse) {
 
-
-	estimatedSize := 0
-	for _, hs := range strategiesResponse.HostStrategies {
-		estimatedSize += len(hs.Strategies)
-	}
-
-	// endpoint:metric => [strategy1, strategy2 ...]
-	//  1. 新建一个巨大的空 Map
-	m := make(map[string][]model.Strategy, estimatedSize)
+	m := make(map[string][]model.Strategy)
 
 	// 2. 遍历所有主机策略，填充这个 Map
 	for _, hs := range strategiesResponse.HostStrategies {
@@ -57,17 +50,13 @@ func rebuildStrategyMap(strategiesResponse *model.StrategiesResponse) {
 
 		for _, strategy := range hs.Strategies {
 			key :=  hostname + "/" +  strategy.Metric
-			if _, exists := m[key]; exists {
-				m[key] = append(m[key], strategy)
-			} else {
-				m[key] = []model.Strategy{strategy}
-			}
+			s := strategy
+			m[key] = append(m[key], s)
 		}
 	}
 
 	store.MapLock.Lock()
 	defer store.MapLock.Unlock()
-
 	// 3. 原子替换全局 Map
 	g.StrategyMap.ReInit(m)
 }
@@ -86,21 +75,19 @@ func syncExpression() {
 func rebuildExpressionMap(expressionResponse *model.ExpressionResponse) {
 	m := make(map[string][]*model.Expression)
 	for _, exp := range expressionResponse.Expressions {
+		// ========== 关键修复：复制表达式 ==========
+		e := exp
+
 		for k, v := range exp.Tags {
 			// key := fmt.Sprintf("%s/%s=%s", exp.Metric, k, v)
 			key := exp.Metric + "/" +  k + "=" + v
-			if _, exists := m[key]; exists {
-				m[key] = append(m[key], exp)
-			} else {
-				m[key] = []*model.Expression{exp}
-			}
+			m[key] = append(m[key], e)
 		}
 	}
 
 	// ========== 加写锁 ==========
 	store.MapLock.Lock()
 	defer store.MapLock.Unlock()
-
 	g.ExpressionMap.ReInit(m)
 }
 
