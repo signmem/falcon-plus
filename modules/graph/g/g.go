@@ -24,8 +24,9 @@ import (
 // 0.5.8 clean GraphItems/historyCache Cache at regular intervals
 // 0.5.9 add flush style(flush by number of every counter's monitoring data)
 // 0.5.11 fix bug of updateAll
+// 0.5.12 优化 mysql 更新频率， 优化指标采集
 const (
-	VERSION      = "0.5.11"
+	VERSION      = "0.5.12"
 	GAUGE        = "GAUGE"
 	DERIVE       = "DERIVE"
 	COUNTER      = "COUNTER"

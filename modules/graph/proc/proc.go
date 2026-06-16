@@ -12,9 +12,11 @@ var (
 
 	IndexUpdateIncrDbEndpointSelectCnt = nproc.NewSCounterQps("IndexUpdateIncrDbEndpointSelectCnt")
 	IndexUpdateIncrDbEndpointInsertCnt = nproc.NewSCounterQps("IndexUpdateIncrDbEndpointInsertCnt")
+	IndexUpdateIncrDbEndpointUpdateCnt = nproc.NewSCounterQps("IndexUpdateIncrDbEndpointUpdateCnt")
 
 	IndexUpdateIncrDbTagEndpointSelectCnt = nproc.NewSCounterQps("IndexUpdateIncrDbTagEndpointSelectCnt")
 	IndexUpdateIncrDbTagEndpointInsertCnt = nproc.NewSCounterQps("IndexUpdateIncrDbTagEndpointInsertCnt")
+	IndexUpdateIncrDbTagEndpointUpdateCnt = nproc.NewSCounterQps("IndexUpdateIncrDbTagEndpointUpdateCnt")
 
 	IndexUpdateIncrDbEndpointCounterSelectCnt = nproc.NewSCounterQps("IndexUpdateIncrDbEndpointCounterSelectCnt")
 	IndexUpdateIncrDbEndpointCounterInsertCnt = nproc.NewSCounterQps("IndexUpdateIncrDbEndpointCounterInsertCnt")
@@ -34,6 +36,7 @@ var (
 	UnIndexedItemCacheCnt = nproc.NewSCounterBase("UnIndexedItemCacheCnt")
 	EndpointCacheCnt      = nproc.NewSCounterBase("EndpointCacheCnt")
 	CounterCacheCnt       = nproc.NewSCounterBase("CounterCacheCnt")
+	CounterCacheDropCnt   = nproc.NewSCounterBase("CounterCacheDropCnt")
 )
 
 // Rpc
@@ -77,9 +80,11 @@ func GetAll() []interface{} {
 
 	ret = append(ret, IndexUpdateIncrDbEndpointSelectCnt.Get())
 	ret = append(ret, IndexUpdateIncrDbEndpointInsertCnt.Get())
+	ret = append(ret, IndexUpdateIncrDbEndpointUpdateCnt.Get())
 
 	ret = append(ret, IndexUpdateIncrDbTagEndpointSelectCnt.Get())
 	ret = append(ret, IndexUpdateIncrDbTagEndpointInsertCnt.Get())
+	ret = append(ret, IndexUpdateIncrDbTagEndpointUpdateCnt.Get())
 
 	ret = append(ret, IndexUpdateIncrDbEndpointCounterSelectCnt.Get())
 	ret = append(ret, IndexUpdateIncrDbEndpointCounterInsertCnt.Get())
@@ -90,6 +95,7 @@ func GetAll() []interface{} {
 	ret = append(ret, UnIndexedItemCacheCnt.Get())
 	ret = append(ret, EndpointCacheCnt.Get())
 	ret = append(ret, CounterCacheCnt.Get())
+	ret = append(ret, CounterCacheDropCnt.Get())
 
 	return ret
 }
