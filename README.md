@@ -48,6 +48,25 @@ scl enable devtoolset-9 bash
 CGO_ENABLED=1  go build -o bin/graph/falcon-graph ./modules/graph
 ```
 
+
+
+* 建议编译使用下面参数
+
+```
+GOOS=linux  GOARCH=amd64  go build -o bin/graph/falcon-graph ./modules/graph
+CGO_ENABLED=1 go build -o bin/graph/falcon-graph ./modules/graph
+```
+
+* 如果要静态编译 (centos7) 运行到 centos6 下
+
+```
+CGO_ENABLED=1 go build -mod=vendor -ldflags "-linkmode external -extldflags '-static'" \
+   -o bin/graph/falcon-graph ./modules/graph
+
+```
+
+
+
 # 编译 kafka_consumer 注意  
 > 必须使用 go1.16 编译  
 
