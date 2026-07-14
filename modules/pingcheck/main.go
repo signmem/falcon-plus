@@ -9,7 +9,6 @@ import (
 	"github.com/signmem/falcon-plus/modules/pingcheck/g"
 	"github.com/signmem/falcon-plus/modules/pingcheck/http"
 	"github.com/signmem/falcon-plus/modules/pingcheck/selector"
-	_ "net/http/pprof"
 	"os"
 	"runtime"
 )
@@ -22,7 +21,7 @@ func init() {
 
 	if *version {
 		version := g.Version
-		fmt.Printf("%s", version)
+		fmt.Printf("pingcheck version: %s\n", version)
 		os.Exit(0)
 	}
 
@@ -45,7 +44,7 @@ func init() {
 
 	redisdb.Client, err = redisdb.RedisClient(redisdb.MaxIdle,redisdb.MaxActive,redisdb.Server)
 	if err != nil {
-		panic(err)
+		g.Logger.Fatalf("create redis client failed: %v", err)
 	}
 }
 
@@ -55,7 +54,7 @@ func main() {
 	numCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPU)
 
-	if g.Config().Redis.Enabled == true {
+	if g.Config().Redis.Enabled {
 		// 用于检测 redis /agent.alive/host 主机过期入口 ( 一秒一次 ) 
 		go falcon.GetRedisHostsExpire() 
 	}
@@ -76,7 +75,7 @@ func main() {
 	go falcon.PingFalseRecheck()  // 15s 一次从 /falcon.ping 中检测主机，after interval 无法 ping 则告警
     
 
-	if g.Config().Degrade.Enabled == true {
+	if g.Config().Degrade.Enabled  {
 		go g.MonitorAgentPeriod()	// 降级 agent 控制
 		go g.MonitorPingPeriod()	// 降级 ping 控制
 	}

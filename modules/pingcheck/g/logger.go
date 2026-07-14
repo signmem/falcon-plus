@@ -2,6 +2,8 @@ package g
 
 import (
 	"fmt"
+	"os"
+
 	// log "github.com/sirupsen/logrus"
 	"github.com/lestrrat/go-file-rotatelogs"
 	"github.com/signmem/go-log/log"
@@ -26,7 +28,8 @@ func InitLog() *log.Logger {
 	)
 
 	if err != nil {
-		panic(fmt.Errorf("error opening file: %v", err))
+		fmt.Errorf("error opening log file: %v", err)
+		os.Exit(1)
 	}
 
 	Logger := log.NewSimple(
@@ -52,7 +55,8 @@ func InitAlarmLog() *log.Logger {
 	)
 
 	if err != nil {
-		panic(fmt.Errorf("error opening alarm file: %v", err))
+		fmt.Errorf("error opening alarm file: %v", err)
+		os.Exit(1)
 	}
 
 	Logger := log.NewSimple(

@@ -30,6 +30,12 @@ func SendMetrics(metrics []*MetricValue, resp *TransferResponse) {
 	for _, i := range rand.Perm(len(g.Config().Transfer.Addrs)) {
 		addr := g.Config().Transfer.Addrs[i]
 
+		if len(addr) == 0 {
+			g.Logger.Error("transfer addrs empty, drop metrics count:", len(metrics))
+			g.TransferSendFailCnt.Incr()
+			continue
+		}
+
 		c := getTransferClient(addr)
 		if c == nil {
 			c = initTransferClient(addr)
@@ -45,18 +51,28 @@ func updateMetrics(c *SingleConnRpcClient, metrics []*MetricValue, resp *Transfe
 	err := c.Call("Transfer.Update", metrics, resp)
 	if err != nil {
 		g.Logger.Error("call Transfer.Update fail:", c, err)
+		g.TransferSendFailCnt.Incr()
 		return false
 	}
+
+	g.TransferSendSuccCnt.Incr()
 	return true
 }
 
 func initTransferClient(addr string) *SingleConnRpcClient {
-	var c *SingleConnRpcClient = &SingleConnRpcClient{
+
+	TransferClientsLock.Lock()
+	defer TransferClientsLock.Unlock()
+
+	if c, ok := TransferClients[addr]; ok {
+		return c
+	}
+
+	c := &SingleConnRpcClient{
 		RpcServer: addr,
 		Timeout:   time.Duration(g.Config().Transfer.Timeout) * time.Millisecond,
 	}
-	TransferClientsLock.Lock()
-	defer TransferClientsLock.Unlock()
+
 	TransferClients[addr] = c
 
 	return c

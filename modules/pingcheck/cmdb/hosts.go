@@ -17,7 +17,7 @@ var (
 	FalconNotReport []string
 	RePingMetrics  []HostInfo
 	AgentAlive []HostInfo
-
+	regDisklessClient = regexp.MustCompile(`DISKLESS-CLIENT`)
 )
 
 func getHostInfoFromCMDB(diableMonitorDomains []string) (falconCheck []HostInfo,
@@ -85,8 +85,8 @@ func getHostInfoFromCMDB(diableMonitorDomains []string) (falconCheck []HostInfo,
 	allHostInfo, err := CmdbApiQuery(api, query)
 
 	if err != nil {
-		g.Logger.Debugf("getHostInfoFromCMDB() error: %s", err)
-		return
+		g.Logger.Errorf("getHostInfoFromCMDB() error: %s", err)
+		return nil, nil, make(map[string][]string), nil, nil, nil
 	}
 
 	// debugHostDisable  不检测 falcon-agent 及 ping 的服务器 
@@ -190,9 +190,11 @@ func getHostInfoFromCMDB(diableMonitorDomains []string) (falconCheck []HostInfo,
 			}
 
 			// 匹配 DISKLESS-CLIENT 主机名，并忽略处理
-			r, _ := regexp.Compile("DISKLESS-CLIENT")
+			// r, _ := regexp.Compile("DISKLESS-CLIENT")
 
-			if r.MatchString(hostInfo.ServerName) == true {
+			if regDisklessClient.MatchString(hostInfo.ServerName) {
+
+			// if r.MatchString(hostInfo.ServerName) == true {
 				debugHostDisable = append(debugHostDisable, hostInfo.ServerName)
 				continue
 			}
@@ -336,6 +338,7 @@ func CheckHostInList(hostname string, hostInfo []HostInfo) (bool) {
 }
 
 func getHostFromHostinfo(hostMap  []HostInfo) (hostList []string) {
+	hostList = make([]string, 0, len(hostMap))
 	for _, host := range hostMap {
 		hostList = append(hostList, host.HostName)
 	}

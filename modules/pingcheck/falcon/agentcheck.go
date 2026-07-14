@@ -17,16 +17,6 @@ func CompireCmdbAndRedis() {
 
 	// all falcon check = cmdb.FalconCheckRecord
 
-	/*
-	time.Sleep( 180 * time.Second)
-
-	var runTime tools.TimeStruct
-
-	runTime.Hour = "15"
-	runTime.Minite = "30"
-
-	allowWeek := []int{1,2,3,4,5}
-	*/
 
 	for {
 
@@ -35,26 +25,16 @@ func CompireCmdbAndRedis() {
 			continue
 		}
 
-		/*
-		t := time.Now()
-		week := int(t.Weekday())
-
-		if tools.IntInSlice(week, allowWeek) || g.Config().ForceCheck == true {
-
-			nowTime := tools.GetNow()
-
-			if runTime == nowTime || g.Config().ForceCheck == true {
-
-				if g.Config().ForceCheck == true {
-					g.Logger.Debugf("[CompireCmdbAndRedis] info: firsttime %t," +
-						" falconCheck: %d, redisrecord: %d", cmdb.FistTime, len(cmdb.FalconCheckRecord),
-						len(redisHostList) )
-				}
-		*/
 		if selector.Role == "master" {
 
 			service := "agent.alive"
-			hostList, _ := redisdb.RedisServiceScan(service)
+			hostList, err := redisdb.RedisServiceScan(service)
+			if err != nil {
+				g.Logger.Errorf("scan agent.alive failed: %v", err)
+				time.Sleep(60 * time.Second)
+				continue
+			}
+
 			noFalconHost := cmdb.FalconNotReport
 
 			if len(noFalconHost) == 0 || len(hostList) == 0 {
