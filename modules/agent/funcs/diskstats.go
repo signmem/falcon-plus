@@ -16,6 +16,7 @@ var (
 
 func UpdateDiskStats() error {
 	dsList, err := nux.ListDiskStats()
+
 	if err != nil {
 		return err
 	}
@@ -92,6 +93,7 @@ func DiskIOMetrics() (L []*model.MetricValue) {
 		log.Println("DiskIOMetrics() error ", err)
 		return
 	}
+
 
 	for _, ds := range dsList {
 		if !ShouldHandleDevice(ds.Device) {
@@ -210,6 +212,6 @@ func IOStatsForPage() (L [][]string) {
 
 func ShouldHandleDevice(device string) bool {
 	normal := len(device) == 3 && (strings.HasPrefix(device, "sd") || strings.HasPrefix(device, "vd") || strings.HasPrefix(device, "df"))
-	aws := len(device) >= 4 && (strings.HasPrefix(device, "xvd") || strings.HasPrefix(device, "fio") || strings.HasPrefix(device, "sdb") || strings.HasPrefix(device, "sda")  || strings.HasPrefix(device, "nvme"))
+	aws := len(device) >= 4 && (strings.HasPrefix(device, "xvd") || strings.HasPrefix(device, "fio") ||  strings.HasPrefix(device, "vda")|| strings.HasPrefix(device, "vdb")|| strings.HasPrefix(device, "sdb")|| strings.HasPrefix(device, "sda") || strings.HasPrefix(device, "nvme"))
 	return normal || aws
 }

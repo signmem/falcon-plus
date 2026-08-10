@@ -41,11 +41,11 @@ import (
 //
 // 5.4.0
 //    support  snmp metrics
-//    support  sdaa sdab ...  disk monitor...
+//
 //
 
 const (
-	VERSION          = "5.4.0_20260707"
+	VERSION          = "5.4.1_20260805"
 	COLLECT_INTERVAL = time.Second
 	URL_CHECK_HEALTH = "url.check.health"
 	NET_PORT_LISTEN  = "net.port.listen"
