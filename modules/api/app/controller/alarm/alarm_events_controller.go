@@ -3,14 +3,14 @@ package alarm
 import (
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	h "github.com/signmem/falcon-plus/modules/api/app/helper"
 	alm "github.com/signmem/falcon-plus/modules/api/app/model/alarm"
+	"log"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type APIGetAlarmListsInputs struct {
@@ -191,7 +191,7 @@ type APIEventCasesGetInputs struct {
 	Status        string `json:"status" form:"status"`
 	ProcessStatus string `json:"process_status" form:"process_status"`
 	Metric        string `json:"metric" form:"metric"`
-	WildCardMatch string `json:"wildcard" from:"wildcard"`
+	WildCardMatch string `json:"wildcard" form:"wildcard"`
 
 
 	BussName string `json:"buss_name" form:"buss_name"`
@@ -204,6 +204,12 @@ type APIEventCasesGetInputs struct {
 
 func GetEventCases(c *gin.Context) {
 	var inputs APIEventCasesGetInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, badstatus, err)
+		return
+	}
+
 	inputs.BussName = c.DefaultQuery("buss_name", "")
 	inputs.GrpName = c.DefaultQuery("grp_name", "")
 	inputs.Endpoint = c.DefaultQuery("endpoint", "")
@@ -218,11 +224,6 @@ func GetEventCases(c *gin.Context) {
 	//for get correct table name
 	//f := alm.EventCases{}
 	cevens := []alm.EventCases{}
-
-	if err := c.Bind(&inputs); err != nil {
-		h.JSONR(c, badstatus, err)
-		return
-	}
 
 	validProcessStatus := []string{"ignored", "unresolved", "resolved", `in progress`, "comment"}
 	if !stringInSlice(inputs.ProcessStatus, validProcessStatus) {
@@ -319,28 +320,28 @@ func GetEventCases(c *gin.Context) {
 type EventCasesWFid struct {
 	ID            string     `json:"id" gorm:"column:id"`
 	HostId        int64      `json:"host_id" gorm:"column:host_id"`
-	Endpoint      string     `json:"endpoint" grom:"column:endpoint"`
+	Endpoint      string     `json:"endpoint" gorm:"column:endpoint"`
 	GrpId         int64      `json:"grp_id" gorm:"column:grp_id"`
-	Grp_name      string     `json:"grp_name" grom:"column:grp_name"`
-	Metric        string     `json:"metric" grom:"metric"`
-	Func          string     `json:"func" grom:"func"`
-	Cond          string     `json:"cond" grom:"cond"`
-	Note          string     `json:"note" grom:"note"`
-	MaxStep       int        `json:"step" grom:"step"`
-	CurrentStep   int        `json:"current_step" grom:"current_step"`
-	Priority      int        `json:"priority" grom:"priority"`
-	Status        string     `json:"status" grom:"status"`
-	Timestamp     *time.Time `json:"timestamp" grom:"timestamp"`
-	UpdateAt      *time.Time `json:"update_at" grom:"update_at"`
-	ClosedAt      *time.Time `json:"closed_at" grom:"closed_at"`
-	ClosedNote    string     `json:"closed_note" grom:"closed_note"`
-	UserModified  int64      `json:"user_modified" grom:"user_modified"`
-	TplCreator    string     `json:"tpl_creator" grom:"tpl_creator"`
-	ExpressionId  int64      `json:"expression_id" grom:"expression_id"`
-	StrategyId    int64      `json:"strategy_id" grom:"strategy_id"`
-	TemplateId    int64      `json:"template_id" grom:"template_id"`
-	ProcessNote   int64      `json:"process_note" grom:"process_note"`
-	ProcessStatus string     `json:"process_status" grom:"process_status"`
+	Grp_name      string     `json:"grp_name" gorm:"column:grp_name"`
+	Metric        string     `json:"metric" gorm:"metric"`
+	Func          string     `json:"func" gorm:"func"`
+	Cond          string     `json:"cond" gorm:"cond"`
+	Note          string     `json:"note" gorm:"note"`
+	MaxStep       int        `json:"step" gorm:"max_step"`
+	CurrentStep   int        `json:"current_step" gorm:"current_step"`
+	Priority      int        `json:"priority" gorm:"priority"`
+	Status        string     `json:"status" gorm:"status"`
+	Timestamp     *time.Time `json:"timestamp" gorm:"timestamp"`
+	UpdateAt      *time.Time `json:"update_at" gorm:"update_at"`
+	ClosedAt      *time.Time `json:"closed_at" gorm:"closed_at"`
+	ClosedNote    string     `json:"closed_note" gorm:"closed_note"`
+	UserModified  int64      `json:"user_modified" gorm:"user_modified"`
+	TplCreator    string     `json:"tpl_creator" gorm:"tpl_creator"`
+	ExpressionId  int64      `json:"expression_id" gorm:"expression_id"`
+	StrategyId    int64      `json:"strategy_id" gorm:"strategy_id"`
+	TemplateId    int64      `json:"template_id" gorm:"template_id"`
+	ProcessNote   int64      `json:"process_note" gorm:"process_note"`
+	ProcessStatus string     `json:"process_status" gorm:"process_status"`
 	FId           int64      `json:"fid" gorm:"column:fid"`
 }
 
@@ -432,7 +433,7 @@ func GetEventCasesV2(c *gin.Context) {
 	//var strategy falcon_portal.Strategy
 	//var expression falcon_portal.Expression
 	tmp_fid := struct {
-		FId int64 `json:"fid" gorm:"column:fid"`
+		FId int64 `json:"fid" json:"column:fid"`
 	}{}
 
 	for i, event := range cevens {
@@ -460,22 +461,41 @@ func GetEventCasesV2(c *gin.Context) {
 
 // GetEventCasesWildCard use to get alarms.event_cases  wildcase info # terry.zeng
 func GetEventCasesWildCard(c *gin.Context) {
+
 	var inputs APIEventCasesGetInputs
+
 	inputs.GrpName = c.DefaultQuery("grp_name", "")
 	inputs.Status = c.DefaultQuery("status", "")
 	inputs.ProcessStatus = c.DefaultQuery("process_status", "unresolved")
 	inputs.Metric = c.DefaultQuery("metric", "all")
 	inputs.Priority = c.DefaultQuery("priority", "-1")
-	inputs.StartTime = c.DefaultQuery("startTime", strconv.FormatInt(time.Now().Unix()-3600, 10))
-	inputs.EndTime = c.DefaultQuery("endTime", strconv.FormatInt(time.Now().Unix(), 10))
+	inputs.StartTime = c.DefaultQuery("start_time", strconv.FormatInt(time.Now().Unix()-3600, 10))
+	inputs.EndTime = c.DefaultQuery("end_time", strconv.FormatInt(time.Now().Unix(), 10))
 	inputs.WildCardMatch = c.DefaultQuery("wildcard", "")
 
 	//for get correct table name
 	//f := alm.EventCases{}
+
+	startTs, err := strconv.ParseInt(inputs.StartTime,10,64)
+	if err != nil {
+		h.JSONR(c, badstatus, fmt.Errorf("startTime invalid timestamp"))
+		return
+	}
+	endTs, err := strconv.ParseInt(inputs.EndTime,10,64)
+	if err != nil {
+		h.JSONR(c, badstatus, fmt.Errorf("endTime invalid timestamp"))
+		return
+	}
+
 	cevens := []EventCasesWFid{}
 
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, badstatus, err)
+		return
+	}
+
+	if startTs > endTs {
+		h.JSONR(c, badstatus, fmt.Errorf("startTime cannot greater than endTime"))
 		return
 	}
 
@@ -540,36 +560,60 @@ func GetEventCasesWildCard(c *gin.Context) {
 		}
 	}
 
+
 	filterTime := func(d *gorm.DB) *gorm.DB {
-		cond := fmt.Sprintf(`update_at >= FROM_UNIXTIME(%v) AND
-		 update_at <= FROM_UNIXTIME(%v)`, inputs.StartTime, inputs.EndTime)
-		return d.Where(cond)
+	    return d.Where("update_at >= FROM_UNIXTIME(?) AND " +
+	    	"update_at <= FROM_UNIXTIME(?)", startTs, endTs)
 	}
+
+	log.Printf("[INFO] from %s to %s", inputs.StartTime, inputs.EndTime)
+
 	db.Alarm.Table("event_cases").Scopes(filterGroup, filterStatus, filterWildCard,
 		filterMetric, filterProcessStatus, filterPriority, filterTime).Find(&cevens)
 
-	//var strategy falcon_portal.Strategy
-	//var expression falcon_portal.Expression
-	tmp_fid := struct {
-		FId int64 `json:"fid" gorm:"column:fid"`
-	}{}
-
 	for i, event := range cevens {
-		if event.StrategyId > 0 && event.ExpressionId == 0 {
-			dt := db.Falcon.Table("strategy").Select("fid").Where("id = ?", event.StrategyId).Find(&tmp_fid)
-			if dt.Error != nil {
-				//h.JSONR(c, expecstatus, "error occurred while fetching strategy.fid")
-				//return
-				continue
-			}
-		} else if event.StrategyId == 0 && event.ExpressionId > 0 {
-			dt := db.Falcon.Table("expression").Select("fid").Where("id = ?", event.ExpressionId).Find(&tmp_fid)
-			if dt.Error != nil {
-				//h.JSONR(c, expecstatus, "error occurred while fetching expression.fid")
-				//return
-				continue
-			}
+
+		var tmp_fid struct {
+			FId int64 `json:"column:fid"`
 		}
+
+		var findErr error
+		if event.StrategyId > 0 && event.ExpressionId == 0 {
+			dt := db.Falcon.Table("strategy").Select("fid").Where(
+				"id = ?", event.StrategyId).Find(&tmp_fid)
+
+			findErr = dt.Error
+
+			if findErr == nil && dt.RowsAffected == 0 {
+				// 正常，库里没有这条策略
+				// terry.zeng
+				log.Print("[WARN] 库里没有这条策略")
+				cevens[i].FId = 0
+				continue
+			}
+
+		} else if event.StrategyId == 0 && event.ExpressionId > 0 {
+			dt := db.Falcon.Table("expression").Select("fid").Where(
+				"id = ?", event.ExpressionId).Find(&tmp_fid)
+			findErr = dt.Error
+			if findErr == nil  &&  dt.RowsAffected == 0 {
+				log.Print("[WARN] 库里没有这条策略")
+				cevens[i].FId = 0
+				continue
+			}
+
+		} else {
+			// 两个id同时大于0，或者都等于0，置0
+			cevens[i].FId = 0
+			continue
+		}
+
+		if findErr != nil {
+			// DB层面异常，打日志，不要静默吞掉
+			log.Printf("[ERROR] DB层面异常 %v", findErr)
+			continue
+		}
+
 		cevens[i].FId = tmp_fid.FId
 	}
 
